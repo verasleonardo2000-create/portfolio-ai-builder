@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard de retenção | Leonardo Veras</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#182737;font:16px/1.5 system-ui}main{max-width:1024px;padding:32px 20px 64px;margin:auto}h1,h2{line-height:1.2}h1{font-size:clamp(2rem,5vw,3.6rem);margin:.2em 0}header{background:#172d44;color:white;padding:24px;border-radius:16px}label,select{font:inherit}select{margin:0 0 0 8px;padding:5px 10px;border-radius:6px}section{background:white;padding:20px;margin-top:18px;border:1px solid #dbe4ee;border-radius:12px}.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.card{padding:12px;background:#eaf2f9;border-radius:8px}.card strong{display:block;font-size:1.65rem}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:9px;border-bottom:1px solid #dbe4ee}.scroll{overflow:auto}.flag{color:#813f06;font-weight:600}caption{text-align:left;margin-bottom:12px}
+</style>
+<main>
+<header><small>ESTUDO DE CASO · LEONARDO VERAS</small><h1>Retenção e recorrência</h1><p>Demonstração com dados inteiramente sintéticos. Explore os indicadores mensais e compare o retorno das coortes.</p><label for="period">Mês de referência</label><select id="period"></select></header>
+<section aria-live="polite"><h2>Visão mensal</h2><div class="cards" id="cards"></div><p id="alert"></p></section>
+<section class="scroll"><h2>Retenção por coorte</h2><table><caption>Percentual da coorte de novos depositantes que voltou a depositar em cada mês subsequente.</caption><thead><tr><th scope="col">Coorte</th><th scope="col">M+1</th><th scope="col">M+2</th><th scope="col">M+3</th></tr></thead><tbody id="cohorts"></tbody></table></section>
+<section><h2>Como usar na operação</h2><p>Compare o churn com o mês anterior e use as coortes para entender quando a retenção cai. Investigue públicos como novos depositantes que ainda não voltaram, usuários ativos sem depósito no mês e usuários que deixaram de estar ativos.</p><p>Nesta demonstração, a recorrência é a proporção dos depositantes do mês que depositaram pelo menos duas vezes naquele mês. O churn é a proporção da base ativa do mês anterior que ficou inativa no mês selecionado.</p></section>
+</main>
+<script>
+const months = [
+  {name:'Janeiro', active:1260, churn:18, repeat:44, cohort:[39,27,21]},
+  {name:'Fevereiro', active:1315, churn:17, repeat:46, cohort:[41,29,22]},
+  {name:'Março', active:1370, churn:19, repeat:43, cohort:[36,25,19]},
+  {name:'Abril', active:1330, churn:23, repeat:39, cohort:[34,22]},
+  {name:'Maio', active:1405, churn:20, repeat:42, cohort:[38]},
+  {name:'Junho', active:1450, churn:18, repeat:45, cohort:[]}
+];
+const select = document.getElementById('period');
+const cards = document.getElementById('cards');
+const alert = document.getElementById('alert');
+const cohorts = document.getElementById('cohorts');
+months.forEach((month,index) => select.add(new Option(month.name,index)));
+function render(){
+  const index = Number(select.value);
+  const month = months[index];
+  const previous = months[index-1];
+  const indicators = [['Base ativa',month.active.toLocaleString('pt-BR')],['Churn',month.churn+'%'],['Recorrência de depósitos',month.repeat+'%']];
+  cards.innerHTML = indicators.map(([label,value]) => '<div class="card">'+label+'<strong>'+value+'</strong></div>').join('');
+  const change = previous ? month.churn - previous.churn : 0;
+  alert.classList.toggle('flag',change >= 3);
+  alert.textContent = change >= 3 ? 'Alerta ilustrativo: churn subiu '+change+' pontos percentuais em relação ao mês anterior.' : previous ? 'Sem alerta de alta de churn (limite ilustrativo de 3 pontos percentuais).' : 'Primeiro mês da série, sem comparação mensal.';
+  cohorts.innerHTML = months.slice(0,index+1).map((row,rowIndex) => '<tr><th scope="row">'+row.name+'</th>'+[1,2,3].map(offset => '<td>'+(rowIndex+offset <= index && row.cohort[offset-1] !== undefined ? row.cohort[offset-1]+'%' : '—')+'</td>').join('')+'</tr>').join('');
+}
+select.value = '5';
+select.addEventListener('change',render);
+render();
+</script>
+</html>

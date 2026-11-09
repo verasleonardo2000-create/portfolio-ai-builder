@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sereno · Gestão de Consultório</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f0e8;--surface:#fff;--border:#e8e0d0;--border-light:#f2efe9;
+  --text:#2c2820;--text-2:#6b6560;--text-3:#9e9890;
+  --green:#6b9470;--green-dark:#4e7554;--green-bg:#e8f0e9;--green-text:#2e5c34;
+  --gold:#c4a55a;--gold-bg:#f5f0dc;--gold-text:#7a5e18;
+  --red:#c47a7a;--red-bg:#f5e8e8;--red-text:#8a2e2e;
+  --blue:#6e8fb5;--blue-bg:#e4ecf5;--blue-text:#2a4870;
+  --purple:#9e7ab5;--purple-bg:#ede8f5;--purple-text:#5e2e8a;
+  --radius:12px;--shadow:0 1px 4px rgba(44,40,32,.07),0 4px 16px rgba(44,40,32,.05);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+/* ── HEADER ── */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 36px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:60}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-logo{width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.hdr-brand h1{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;line-height:1.1}
+.hdr-brand p{font-size:11px;color:var(--text-3);margin-top:1px}
+.hdr-nav{display:flex;gap:2px}
+.nav-btn{padding:8px 15px;border-radius:8px;border:none;background:transparent;font-size:13px;cursor:pointer;color:var(--text-2);transition:all .15s;font-family:'DM Sans',sans-serif;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-btn svg{width:14px;height:14px;opacity:.65;flex-shrink:0}
+.nav-btn.active{background:var(--green);color:#fff}
+.nav-btn.active svg{opacity:1}
+.nav-btn:hover:not(.active){background:var(--bg);color:var(--green)}
+.hdr-user{display:flex;align-items:center;gap:10px}
+.hdr-user-info{text-align:right}
+.hdr-user-info strong{font-size:13px;font-weight:600;display:block;line-height:1.2}
+.hdr-user-info span{font-size:11px;color:var(--text-3)}
+.hdr-avatar{width:34px;height:34px;border-radius:50%;background:var(--green-bg);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--green-text)}
+
+/* ── PAGES ── */
+.page{display:none;padding:32px 36px;max-width:1400px}
+.page.active{display:block}
+.pg-hdr{margin-bottom:28px}
+.pg-hdr-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+.pg-sub{font-size:12px;color:var(--text-3);font-weight:500;margin-bottom:4px}
+.pg-title{font-family:'DM Serif Display',serif;font-size:30px;font-weight:400;letter-spacing:-.02em;line-height:1.1}
+.pg-title.xl{font-size:38px}
+
+/* ── CARDS ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:16px;margin-bottom:28px}
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px 22px;box-shadow:var(--shadow)}
+.card.card-dark{background:var(--green);border-color:var(--green-dark)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.card-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+.ci-g{background:var(--green-bg);color:var(--green)}
+.ci-r{background:var(--red-bg);color:var(--red)}
+.ci-b{background:var(--blue-bg);color:var(--blue)}
+.ci-gold{background:var(--gold-bg);color:var(--gold)}
+.ci-w{background:rgba(255,255,255,.22);color:#fff}
+.card-tag{font-size:11px;color:var(--text-3);font-weight:500}
+.card-dark .card-tag{color:rgba(255,255,255,.6)}
+.card-label{font-size:12px;color:var(--text-2);margin-bottom:4px}
+.card-dark .card-label{color:rgba(255,255,255,.75)}
+.card-value{font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.cv-g{color:var(--green)}.cv-r{color:var(--red)}.cv-b{color:var(--blue)}.cv-gold{color:var(--gold)}
+.card-dark .card-value{color:#fff}
+
+/* ── TABLES ── */
+.table-wrap{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:24px;box-shadow:var(--shadow)}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:480px}
+th{text-align:left;padding:10px 18px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);background:var(--bg);border-bottom:1px solid var(--border);font-weight:700;white-space:nowrap}
+td{padding:11px 18px;border-bottom:1px solid var(--border-light);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#faf7f2}
+.empty td{text-align:center;color:var(--text-3);padding:40px;font-style:italic}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:600;white-space:nowrap}
+.bg{background:var(--green-bg);color:var(--green-text)}
+.bgold{background:var(--gold-bg);color:var(--gold-text)}
+.bb{background:var(--blue-bg);color:var(--blue-text)}
+.bpurple{background:var(--purple-bg);color:var(--purple-text)}
+.bred{background:var(--red-bg);color:var(--red-text)}
+.bgray{background:#f0ede8;color:var(--text-3)}
+.badge-btn{border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s}
+.badge-btn:hover{filter:brightness(.94)}
+
+/* ── STATUS SELECTS ── */
+.ss{font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;border:none;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;font-family:'DM Sans',sans-serif}
+.ss-pendente{background:var(--gold-bg);color:var(--gold-text)}
+.ss-pagou{background:var(--green-bg);color:var(--green-text)}
+.ss-agendada{background:var(--blue-bg);color:var(--blue-text)}
+.ss-realizada{background:var(--green-bg);color:var(--green-text)}
+.ss-concluida{background:var(--green-bg);color:var(--green-text)}
+.ss-pagamento{background:#e8f5e9;color:#1b5e20}
+.ss-faltou{background:var(--red-bg);color:var(--red-text)}
+.ss-remarcada{background:var(--purple-bg);color:var(--purple-text)}
+.ss-faturada{background:var(--green-bg);color:var(--green-text)}
+.ss-falta-faturar{background:var(--gold-bg);color:var(--gold-text)}
+.ss-emitida{background:var(--green-bg);color:var(--green-text)}
+.ss-falta-emitir{background:var(--gold-bg);color:var(--gold-text)}
+.ss-nao-emitida{background:#f0ede8;color:var(--text-3)}
+.ss-isenta{background:var(--blue-bg);color:var(--blue-text)}
+.ss-cancelado{background:#ecebe6;color:#8b857b}
+
+/* ── BUTTONS ── */
+.btn-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:4px 7px;border-radius:4px}
+.btn-del:hover{background:var(--red-bg)}
+.btn-sm{background:none;border:1px solid var(--border);color:var(--text-2);cursor:pointer;font-size:11px;padding:4px 10px;border-radius:6px;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn-sm:hover{background:var(--bg);border-color:var(--green);color:var(--green)}
+.btn-save{background:var(--green);color:#fff;border:none;padding:10px 22px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;display:inline-flex;align-items:center;gap:7px}
+.btn-save:hover{background:var(--green-dark)}
+.btn-outline{background:transparent;color:var(--text-2);border:1px solid var(--border);padding:10px 22px;border-radius:50px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-outline:hover{border-color:var(--green);color:var(--green)}
+.btn-pill{padding:7px 16px;border-radius:50px;border:1px solid var(--border);background:var(--surface);font-size:13px;cursor:pointer;color:var(--text-2);transition:all .15s;font-family:'DM Sans',sans-serif;font-weight:500}
+.btn-pill.active{background:var(--surface);border-color:var(--text-2);color:var(--text);font-weight:600}
+.btn-pill:hover:not(.active){border-color:var(--green);color:var(--green)}
+.btn-novo{background:var(--green);color:#fff;border:none;padding:9px 20px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
+.btn-novo:hover{background:var(--green-dark)}
+
+/* ── FORMS ── */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+label{font-size:12px;font-weight:500;color:var(--text-2)}
+input,select,textarea{font-size:14px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);outline:none;width:100%;font-family:'DM Sans',sans-serif;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--green)}
+textarea{resize:vertical;min-height:100px}
+.hint{font-size:11px;color:var(--text-3);margin-top:2px}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.fi{font-size:13px;padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);outline:none;font-family:'DM Sans',sans-serif}
+.fi:focus{border-color:var(--green)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:999;transform:translateY(8px)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(44,40,32,.4);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:18px;border:1px solid var(--border);padding:32px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(44,40,32,.2);animation:mIn .2s ease;position:relative}
+@keyframes mIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:18px;color:var(--text-3);cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--bg);color:var(--text)}
+.modal h3{font-size:18px;font-weight:600;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--text-3);margin-bottom:22px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+
+/* ── ACCORDION ── */
+.acc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px}
+.acc-h{padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:14px;user-select:none;transition:background .15s}
+.acc-h:hover{background:var(--bg)}
+.acc-icon{font-size:11px;transition:transform .2s;color:var(--text-3)}
+.acc.open .acc-icon{transform:rotate(180deg)}
+.acc-body{display:none;border-top:1px solid var(--border)}
+.acc.open .acc-body{display:block}
+
+/* ── AUTOCOMPLETE ── */
+.ac-wrap{position:relative}
+.ac-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(44,40,32,.14);z-index:100;max-height:200px;overflow-y:auto;display:none}
+.ac-list.open{display:block}
+.ac-item{padding:9px 14px;font-size:13px;cursor:pointer;transition:background .1s}
+.ac-item:hover{background:var(--bg)}
+.ac-item small{color:var(--text-3);font-size:11px}
+
+/* ══════════════════════════════════
+   AGENDA – SEMANA
+══════════════════════════════════ */
+.agenda-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.agenda-nav{display:flex;align-items:center;gap:8px}
+.agenda-nav button{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:15px;color:var(--text-2);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.agenda-nav button:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-hoje{padding:6px 14px;border-radius:50px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;color:var(--text-2);font-family:'DM Sans',sans-serif;font-weight:500;transition:all .15s}
+.btn-hoje:hover{border-color:var(--green);color:var(--green)}
+
+/* Grade semanal */
+.week-grid{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.week-header{display:grid;grid-template-columns:56px repeat(7,1fr);border-bottom:1px solid var(--border)}
+.week-header-cell{padding:10px 6px;text-align:center;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;border-right:1px solid var(--border-light)}
+.week-header-cell:last-child{border-right:none}
+.week-day-num{font-size:20px;font-weight:400;display:block;margin-top:2px;color:var(--text)}
+.week-day-num.today-num{width:32px;height:32px;background:var(--green);color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:600}
+.week-body{display:grid;grid-template-columns:56px repeat(7,1fr);overflow-y:auto;max-height:520px}
+.time-col{border-right:1px solid var(--border-light)}
+.time-slot{height:56px;display:flex;align-items:flex-start;justify-content:flex-end;padding:4px 8px 0 0;font-size:11px;color:var(--text-3);border-bottom:1px solid var(--border-light)}
+.day-col{border-right:1px solid var(--border-light);position:relative;min-height:56px}
+.day-col:last-child{border-right:none}
+.day-slot{height:56px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background .1s}
+.day-slot:hover{background:#f8f5f0}
+.day-slot:last-child{border-bottom:none}
+.week-event{position:absolute;left:3px;right:3px;border-radius:8px;padding:4px 7px;font-size:11px;font-weight:600;cursor:pointer;z-index:2;overflow:hidden;transition:opacity .15s;line-height:1.3}
+.week-event:hover{opacity:.85}
+.we-green{background:var(--green-bg);color:var(--green-text);border-left:3px solid var(--green)}
+.we-gold{background:var(--gold-bg);color:var(--gold-text);border-left:3px solid var(--gold)}
+.we-red{background:var(--red-bg);color:var(--red-text);border-left:3px solid var(--red)}
+.we-blue{background:var(--blue-bg);color:var(--blue-text);border-left:3px solid var(--blue)}
+.we-purple{background:var(--purple-bg);color:var(--purple-text);border-left:3px solid var(--purple)}
+.we-gray{background:#efede8;color:#8b857b;border-left:3px solid #b8b2a6}
+
+/* Grade mensal */
+.month-grid-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.month-dow-row{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)}
+.month-dow{padding:10px 0;text-align:center;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+.month-weeks{display:grid;grid-template-columns:repeat(7,1fr)}
+.month-cell{border-right:1px solid var(--border-light);border-bottom:1px solid var(--border-light);padding:8px 10px;min-height:90px;cursor:pointer;transition:background .1s;position:relative}
+.month-cell:nth-child(7n){border-right:none}
+.month-cell:hover{background:#faf7f2}
+.month-cell.other-m{opacity:.35;cursor:default}
+.month-cell.other-m:hover{background:transparent}
+.mc-num{font-size:13px;font-weight:500;color:var(--text-2);margin-bottom:4px;display:inline-block}
+.mc-today .mc-num{width:24px;height:24px;background:var(--green);color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.mc-event{font-size:11px;display:flex;align-items:center;gap:4px;margin-bottom:2px;color:var(--text-2)}
+.mc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--green)}.dot-gold{background:var(--gold)}.dot-red{background:var(--red)}.dot-blue{background:var(--blue)}.dot-purple{background:var(--purple)}.dot-gray{background:#b8b2a6}
+
+/* ── Agenda: cabeçalho + troca de visão centralizada ── */
+.agenda-head{text-align:center;margin-bottom:16px}
+.agenda-topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:24px}
+.atb-left{display:flex;justify-content:flex-start}
+.atb-center{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.atb-right{display:flex;justify-content:flex-end;align-items:center}
+
+/* ── Agenda: vista de ano ── */
+.year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.year-month{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px 16px;box-shadow:var(--shadow)}
+.ym-title{font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:10px;cursor:pointer;color:var(--text);display:inline-block}
+.ym-title:hover{color:var(--green)}
+.ym-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.ym-dow span{text-align:center;font-size:9px;color:var(--text-3);font-weight:700}
+.ym-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.ym-day{text-align:center;font-size:11px;border-radius:50%;color:var(--text-2);cursor:pointer;aspect-ratio:1;display:flex;align-items:center;justify-content:center;transition:background .1s}
+.ym-day.empty{cursor:default}
+.ym-day:not(.empty):hover{background:var(--bg)}
+.ym-has{font-weight:700;color:var(--green-text);background:var(--green-bg)}
+.ym-today{background:var(--green);color:#fff;font-weight:700}
+.ym-today.ym-has{color:#fff}
+
+/* ── Modal consulta: link novo paciente ── */
+.mc-novo-link{display:inline-block;margin-top:7px;font-size:12px;color:var(--green);cursor:pointer;font-weight:600}
+.mc-novo-link:hover{text-decoration:underline}
+
+/* ── Modal consulta: aplicar às próximas ── */
+.mc-check{display:flex;align-items:flex-start;gap:9px;cursor:pointer;font-weight:500;color:var(--text-2);font-size:12.5px;line-height:1.4;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
+.mc-check input{width:auto;margin:1px 0 0;accent-color:var(--green);flex-shrink:0;cursor:pointer}
+
+/* ── Menu de contexto (botão direito na consulta) ── */
+.ctx-menu{position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(44,40,32,.2);padding:5px;min-width:196px;display:none}
+.ctx-menu.open{display:block;animation:mIn .12s ease}
+.ctx-menu-head{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);font-weight:700;padding:6px 12px 4px}
+.ctx-menu-item{display:flex;align-items:center;gap:9px;padding:8px 12px;font-size:13px;border-radius:8px;cursor:pointer;color:var(--text);user-select:none}
+.ctx-menu-item:hover{background:var(--bg)}
+.ctx-menu-item .ctx-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.ctx-menu-item .ctx-check{margin-left:auto;color:var(--green);font-weight:700}
+.ctx-sep{height:1px;background:var(--border-light);margin:5px 6px}
+.ctx-menu-item.danger{color:var(--red-text)}
+.ctx-menu-item.danger:hover{background:var(--red-bg)}
+
+@media(max-width:760px){
+  .agenda-topbar{grid-template-columns:1fr;justify-items:center}
+  .atb-left,.atb-right{justify-content:center}
+  .year-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:520px){ .year-grid{grid-template-columns:1fr} }
+
+/* ══════════════════════════════════
+   PACIENTES – split layout
+══════════════════════════════════ */
+.pac-layout{display:grid;grid-template-columns:310px 1fr;gap:20px;align-items:start}
+.pac-sidebar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.pac-search-wrap{padding:14px;border-bottom:1px solid var(--border)}
+.pac-search{width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border);border-radius:50px;font-size:13px;background:var(--bg);outline:none;font-family:'DM Sans',sans-serif;transition:border .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239e9890' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:12px center}
+.pac-search:focus{border-color:var(--green);background-color:var(--surface)}
+.pac-list{max-height:520px;overflow-y:auto}
+.pac-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border-light);transition:background .1s}
+.pac-item:last-child{border-bottom:none}
+.pac-item:hover{background:var(--bg)}
+.pac-item.active{background:var(--green-bg)}
+.pac-avatar{width:34px;height:34px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--green-text);flex-shrink:0}
+.pac-item.active .pac-avatar{background:var(--green);color:#fff}
+.pac-item-info strong{font-size:13px;font-weight:600;display:block;line-height:1.3}
+.pac-item-info span{font-size:11px;color:var(--text-3)}
+
+.pac-detail{min-height:300px}
+.pac-detail-empty{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:60px 32px;text-align:center;color:var(--text-3);font-style:italic;box-shadow:var(--shadow)}
+
+/* ── Pacientes: cabeçalho da barra (Home + ocultar) ── */
+.pac-sidebar-head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.pac-home-btn{flex:1;display:flex;align-items:center;gap:9px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-2);transition:all .15s;white-space:nowrap;overflow:hidden}
+.pac-home-btn:hover,.pac-home-btn.active{background:var(--green-bg);border-color:var(--green);color:var(--green-text)}
+.pac-home-ic{font-size:16px;line-height:1;flex-shrink:0}
+.pac-collapse{width:30px;height:30px;flex-shrink:0;border:1px solid var(--border);background:var(--surface);border-radius:8px;cursor:pointer;color:var(--text-2);font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pac-collapse:hover{border-color:var(--green);color:var(--green)}
+.pac-new-wrap{padding:10px 14px;border-bottom:1px solid var(--border)}
+.pac-inativos-toggle{width:100%;text-align:left;background:var(--bg);border:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border-light);padding:9px 16px;font-size:11px;font-weight:700;color:var(--text-3);cursor:pointer;text-transform:uppercase;letter-spacing:.05em;font-family:'DM Sans',sans-serif}
+.pac-inativos-toggle:hover{color:var(--green)}
+.pac-inativos .pac-item{opacity:.72}
+
+/* ── Barra lateral colapsada (ícones pequenos) ── */
+.pac-layout.collapsed{grid-template-columns:70px 1fr}
+.pac-sidebar.collapsed .pac-search-wrap,
+.pac-sidebar.collapsed .pac-home-tx,
+.pac-sidebar.collapsed .pac-new-tx,
+.pac-sidebar.collapsed .pac-item-info,
+.pac-sidebar.collapsed .pac-inativos-toggle,
+.pac-sidebar.collapsed .pac-inativos{display:none}
+.pac-sidebar.collapsed .pac-sidebar-head{flex-direction:column-reverse;gap:8px;padding:10px 8px}
+.pac-sidebar.collapsed .pac-home-btn{justify-content:center;padding:8px 0;width:100%}
+.pac-sidebar.collapsed .pac-new-wrap{padding:8px}
+.pac-sidebar.collapsed .btn-novo{padding:8px 0}
+.pac-sidebar.collapsed .btn-novo .pac-new-ic{font-size:16px}
+.pac-sidebar.collapsed .pac-item{justify-content:center;padding:10px 4px}
+.pac-sidebar.collapsed .pac-avatar{width:30px;height:30px;font-size:12px}
+.pac-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:16px}
+.pac-profile{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.pac-avatar-lg{width:56px;height:56px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0}
+.pac-profile-info h3{font-size:20px;font-weight:600;margin-bottom:4px}
+.pac-profile-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text-2)}
+.pac-profile-meta span{display:flex;align-items:center;gap:4px}
+.pac-notes{background:var(--bg);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text-2);margin-top:12px}
+
+.pac-fin-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.pac-fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+.pfc-label{font-size:12px;color:var(--text-2);margin-bottom:4px}
+.pfc-value{font-size:22px;font-weight:600;letter-spacing:-.02em}
+
+.pac-hist-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;transition:background .1s}
+.pac-hist-item:hover{background:#faf7f2}
+.phi-left h4{font-size:13px;font-weight:600;margin-bottom:3px}
+.phi-left p{font-size:12px;color:var(--text-3)}
+.phi-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.phi-valor{font-size:13px;font-weight:600;color:var(--text-2)}
+
+.pac-month-filter{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.pac-month-filter label{font-size:12px;color:var(--text-3);font-weight:500;white-space:nowrap}
+
+/* ══════════════════════════════════
+   CADASTRO
+══════════════════════════════════ */
+.cad-layout{display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start;max-width:960px}
+.cad-form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow)}
+.cad-aside{display:flex;flex-direction:column;gap:16px}
+.cad-tip{background:var(--green-bg);border-radius:var(--radius);padding:22px;border:1px solid rgba(107,148,112,.2)}
+.cad-tip-icon{font-size:20px;margin-bottom:10px}
+.cad-tip h4{font-size:15px;font-weight:600;color:var(--green-text);margin-bottom:6px}
+.cad-tip p{font-size:13px;color:var(--green-text);opacity:.8;line-height:1.5}
+.cad-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+.cad-stat-label{font-size:12px;color:var(--text-3);margin-bottom:4px}
+.cad-stat-value{font-size:28px;font-weight:600;letter-spacing:-.02em;margin-bottom:2px}
+.cad-stat-hint{font-size:11px;color:var(--text-3)}
+
+/* ══════════════════════════════════
+   FINANCEIRO
+══════════════════════════════════ */
+.fin-chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:24px;box-shadow:var(--shadow)}
+.fin-period{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.fin-range{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+.fin-tooltip{position:absolute;display:none;background:var(--text);color:#fff;border-radius:10px;padding:10px 12px;font-size:12px;min-width:158px;box-shadow:0 8px 28px rgba(44,40,32,.28);pointer-events:none;z-index:20}
+.ftt-title{font-weight:700;margin-bottom:6px;font-size:12px}
+.ftt-row{display:flex;justify-content:space-between;gap:14px;align-items:center;line-height:1.7}
+.ftt-row span{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.85)}
+.ftt-row i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.ftt-row b{font-weight:600}
+.ftt-sep{height:1px;background:rgba(255,255,255,.18);margin:5px 0}
+.bulk-btns{display:flex;gap:8px;flex-wrap:wrap}
+.fin-det-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 2px;border-bottom:1px solid var(--border-light)}
+.fin-det-row:last-child{border-bottom:none}
+.fin-det-row .fdl{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text-2)}
+.fin-det-row .fdl i{width:10px;height:10px;border-radius:3px;display:inline-block;flex-shrink:0}
+.fin-det-row .fdv{font-weight:600;font-size:14px}
+.fin-det-total{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 2px 2px;margin-top:6px;border-top:2px solid var(--border)}
+.fin-det-total .fdl{font-weight:600;font-size:14px}
+.fin-det-total .fdv{font-weight:700;font-size:16px}
+@media(max-width:760px){ .fin-range{margin-left:0} }
+
+/* ══════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════ */
+@media(max-width:1100px){
+  .pac-layout{grid-template-columns:260px 1fr}
+  .cad-layout{grid-template-columns:1fr}
+}
+@media(max-width:860px){
+  header{padding:0 16px;height:auto;flex-wrap:wrap;padding:10px 16px;gap:8px}
+  .hdr-nav{flex-wrap:wrap;gap:2px}
+  .page{padding:16px}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .pac-layout{grid-template-columns:1fr}
+  .pac-fin-cards{grid-template-columns:1fr}
+  .field-row,.field-row3{grid-template-columns:1fr}
+  .pg-title.xl{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-left">
+    <div class="hdr-logo">🌿</div>
+    <div class="hdr-brand">
+      <h1>Sereno</h1>
+      <p>Gestão de consultório</p>
+    </div>
+  </div>
+  <nav class="hdr-nav">
+    <button class="nav-btn active" onclick="showPage('dashboard',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Dashboard</button>
+    <button class="nav-btn" onclick="showPage('agenda',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 1v3M11 1v3M2 7h12"/></svg>Agenda</button>
+    <button class="nav-btn" onclick="showPage('pacientes',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>Pacientes</button>
+    <button class="nav-btn" onclick="showPage('financeiro',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M2 7h12M6 7v6"/></svg>Financeiro</button>
+  </nav>
+  <div class="hdr-user">
+    <div class="hdr-user-info">
+      <strong id="hdrNome">Profissional Demo</strong>
+      <span id="hdrCrp">Consultório demonstrativo</span>
+    </div>
+    <div class="hdr-avatar" id="hdrAvatar">H</div>
+  </div>
+</header>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div id="page-dashboard" class="page active">
+  <div class="pg-hdr-row">
+    <div class="pg-hdr">
+      <p class="pg-sub">Visão geral</p>
+      <h2 class="pg-title">Dashboard</h2>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="agenda-nav" onclick="changeMonth(-1)" style="all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text-2)">‹</button>
+      <span id="monthLabel" style="font-size:15px;font-weight:600;min-width:165px;text-align:center"></span>
+      <button class="agenda-nav" onclick="changeMonth(1)" style="all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text-2)">›</button>
+      <input type="month" id="monthPicker" class="fi" style="width:155px" onchange="pickMonth(this.value)">
+    </div>
+  </div>
+  <div class="cards" id="dashCards"></div>
+
+  <!-- Consultas do mês (histórico) -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:15px;font-weight:600">Consultas do mês</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input class="fi" type="text" id="dashHistNome" placeholder="Buscar por nome..." oninput="renderDashHist()" style="width:180px">
+      <select class="fi" id="dashHistPaciente" onchange="renderDashHist()" style="width:170px">
+        <option value="">Todos os pacientes</option>
+      </select>
+      <select class="fi" id="dashHistSessao" onchange="renderDashHist()" style="width:165px">
+        <option value="">Todos os status</option>
+        <option value="agendada">Agendada</option>
+        <option value="concluida">Concluída</option>
+        <option value="faltou">Paciente Faltou</option>
+        <option value="pagamento">Pagamento Realizado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Data</th><th>Horário</th><th>Paciente</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead>
+        <tbody id="tabelaHistDash"></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="pacientePanel"></div>
+</div>
+
+<!-- ══════════════ AGENDA ══════════════ -->
+<div id="page-agenda" class="page">
+  <div class="agenda-head">
+    <p class="pg-sub">Sua semana com calma</p>
+    <h2 class="pg-title xl" id="agendaTitleLabel"></h2>
+  </div>
+  <div class="agenda-topbar">
+    <div class="atb-left">
+      <div class="agenda-nav" style="display:flex;gap:6px;align-items:center">
+        <button onclick="navAgenda(-1)">‹</button>
+        <button class="btn-hoje" onclick="goToToday()">Hoje</button>
+        <button onclick="navAgenda(1)">›</button>
+      </div>
+    </div>
+    <div class="atb-center">
+      <button class="btn-pill" id="btnDia" onclick="setAgendaView('dia')">Dia</button>
+      <button class="btn-pill active" id="btnSemana" onclick="setAgendaView('semana')">Semana</button>
+      <button class="btn-pill" id="btnMes" onclick="setAgendaView('mes')">Mês</button>
+      <button class="btn-pill" id="btnAno" onclick="setAgendaView('ano')">Ano</button>
+    </div>
+    <div class="atb-right">
+      <select class="fi" id="agendaPacFiltro" onchange="setAgendaPacFiltro(this.value)" style="width:190px">
+        <option value="">Todos os pacientes</option>
+      </select>
+    </div>
+  </div>
+  <div id="agendaView"></div>
+</div>
+
+<!-- ══════════════ PACIENTES ══════════════ -->
+<div id="page-pacientes" class="page">
+  <div class="pg-hdr-row">
+    <div>
+      <p class="pg-sub">Cuidando de quem cuida</p>
+      <h2 class="pg-title">Pacientes</h2>
+    </div>
+  </div>
+  <div class="pac-layout" id="pacLayout">
+    <div class="pac-sidebar" id="pacSidebar">
+      <div class="pac-sidebar-head">
+        <button class="pac-home-btn" id="pacHomeBtn" onclick="mostrarHome()" title="Início">
+          <span class="pac-home-ic">⌂</span><span class="pac-home-tx">Home</span>
+        </button>
+        <button class="pac-collapse" id="pacCollapseBtn" onclick="togglePacSidebar()" title="Ocultar / expandir">‹</button>
+      </div>
+      <div class="pac-search-wrap">
+        <input class="pac-search" type="text" id="pacSearch" placeholder="Buscar paciente..." oninput="renderPacList()">
+      </div>
+      <div class="pac-new-wrap">
+        <button class="btn-novo" style="width:100%;justify-content:center;padding:8px" onclick="abrirModalNovoPaciente()"><span class="pac-new-ic">＋</span><span class="pac-new-tx">Novo paciente</span></button>
+      </div>
+      <div class="pac-list" id="pacList"></div>
+    </div>
+    <div class="pac-detail" id="pacDetail"></div>
+  </div>
+</div>
+
+<!-- ══════════════ FINANCEIRO ══════════════ -->
+<div id="page-financeiro" class="page">
+  <div class="pg-hdr-row">
+    <div>
+      <p class="pg-sub">Fluxo financeiro</p>
+      <h2 class="pg-title">Receitas &amp; Despesas</h2>
+    </div>
+    <button class="btn-novo" onclick="abrirModalDespesa()">+ Nova despesa</button>
+  </div>
+
+  <!-- Seletor de período -->
+  <div class="fin-period">
+    <div class="agenda-nav" style="display:flex;gap:6px;align-items:center">
+      <button onclick="navFin(-1)">‹</button>
+      <button class="btn-hoje" onclick="finHoje()">Hoje</button>
+      <button onclick="navFin(1)">›</button>
+    </div>
+    <div class="atb-center" style="justify-content:flex-start">
+      <button class="btn-pill" id="finBtnSemana" onclick="setFinView('semana')">Semana</button>
+      <button class="btn-pill active" id="finBtnMes" onclick="setFinView('mes')">Mês</button>
+      <button class="btn-pill" id="finBtnAno" onclick="setFinView('ano')">Ano</button>
+    </div>
+    <div class="fin-range">
+      <span style="font-size:12px;color:var(--text-3)">Intervalo:</span>
+      <input type="date" id="finDe" class="fi" onchange="setFinRange()" style="width:150px">
+      <span style="color:var(--text-3)">→</span>
+      <input type="date" id="finAte" class="fi" onchange="setFinRange()" style="width:150px">
+      <button class="btn-sm" id="finRangeClear" style="display:none" onclick="limparFinRange()">Limpar</button>
+    </div>
+  </div>
+  <div style="font-size:13px;color:var(--text-2);font-weight:600;margin:0 0 18px" id="finPeriodoLabel"></div>
+
+  <div class="cards" id="finCards"></div>
+
+  <div class="fin-chart-box">
+    <div style="font-size:16px;font-weight:600;margin-bottom:2px">Receita &amp; despesas por mês</div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:24px">Passe o mouse sobre um mês para ver a divisão da receita (previsto · realizado · em aberto)</div>
+    <div style="position:relative;height:220px"><canvas id="finChart"></canvas><div class="fin-tooltip" id="finTooltip"></div></div>
+    <div style="display:flex;gap:20px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)"><span style="width:12px;height:12px;border-radius:3px;background:var(--green);display:inline-block"></span>Receita total</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)"><span style="width:12px;height:12px;border-radius:3px;background:var(--red);display:inline-block"></span>Despesas</div>
+    </div>
+  </div>
+
+  <!-- Despesas -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;flex-wrap:wrap;gap:10px">
+    <div style="font-size:15px;font-weight:600">Despesas do período</div>
+    <select class="fi" id="finFiltroCat" onchange="renderFinanceiro()" style="width:160px">
+      <option value="">Todas categorias</option>
+      <option>Aluguel</option><option>Materiais</option><option>Equipamentos</option>
+      <option>Cursos/Supervisão</option><option>Software</option><option>Marketing</option><option>Outros</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Descrição</th><th>Categoria</th><th>Data</th><th>Valor</th><th></th></tr></thead>
+        <tbody id="tabelaDespesas"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Notas fiscais -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin:28px 0 12px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-size:15px;font-weight:600">Notas fiscais</div>
+      <div style="font-size:12px;color:var(--text-3)" id="finNFResumo"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select class="fi" id="finNFPacFiltro" onchange="setFinNFPac(this.value)" style="width:180px">
+        <option value="">Todos os pacientes</option>
+      </select>
+      <button class="btn-save" id="btnMarcarNFs" onclick="marcarNFTodasEmitidas()">Marcar todas como emitidas</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Data</th><th>Paciente</th><th>Valor</th><th>Status</th><th>Nota fiscal</th></tr></thead>
+        <tbody id="tabelaNF"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ CADASTRO ══════════════ -->
+<!-- ══════════════ MODAIS ══════════════ -->
+
+<!-- Modal Novo Paciente (via aba Pacientes) -->
+<div class="modal-overlay" id="modalNovoPaciente">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalNovoPaciente')">✕</button>
+    <h3>Novo paciente</h3>
+    <p class="modal-sub">Cadastre um novo paciente no sistema.</p>
+    <div class="field"><label>Nome completo</label><input type="text" id="npNome" placeholder="Ex.: Maria da Silva"></div>
+    <div class="field-row">
+      <div class="field" style="margin-bottom:0"><label>E-mail</label><input type="email" id="npEmail" placeholder="paciente@example.com"></div>
+      <div class="field" style="margin-bottom:0"><label>Telefone</label><input type="tel" id="npTelefone" placeholder="(11) 99999-9999" oninput="fmtTelefone(this)" maxlength="15"></div>
+    </div>
+    <div class="field-row" style="margin-top:16px">
+      <div class="field" style="margin-bottom:0"><label>Data de nascimento</label><input type="date" id="npNascimento"></div>
+      <div class="field" style="margin-bottom:0"><label>Valor da consulta (R$)</label><input type="number" id="npValor" placeholder="0,00" step="0.01" min="0"></div>
+    </div>
+    <div class="field" style="margin-top:16px"><label>Observações</label><textarea id="npObs" placeholder="Motivo do atendimento, contexto..." style="min-height:70px"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal('modalNovoPaciente')">Cancelar</button>
+      <button class="btn-save" onclick="salvarNovoPacienteModal()">Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Consulta (criar / editar) -->
+<div class="modal-overlay" id="modalConsulta">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalConsulta')">✕</button>
+    <input type="hidden" id="mcEditId">
+    <h3 id="mcTitulo">Novo agendamento</h3>
+    <p class="modal-sub" id="modalConsultaSub">Agende uma consulta para um paciente.</p>
+    <div class="field">
+      <label>Paciente</label>
+      <div class="ac-wrap">
+        <input type="text" id="mcBusca" placeholder="Buscar paciente..." autocomplete="off"
+          oninput="mcAcSearch()" onfocus="mcAcSearch()" onblur="setTimeout(()=>document.getElementById('mcAcList').classList.remove('open'),200)">
+        <div class="ac-list" id="mcAcList"></div>
+        <input type="hidden" id="mcPaciente">
+      </div>
+      <span class="mc-novo-link" id="mcNovoLink" onclick="irNovoPacienteDaConsulta()">+ Cadastrar novo paciente</span>
+    </div>
+    <div class="field" id="mcStatusWrap" style="display:none">
+      <label>Status da sessão</label>
+      <select class="ss" id="mcStatus" onchange="this.className='ss ss-'+this.value" style="width:100%;border-radius:10px;padding:10px 14px">
+        <option value="agendada">Agendada</option>
+        <option value="concluida">Concluída</option>
+        <option value="faltou">Paciente Faltou</option>
+        <option value="pagamento">Pagamento Realizado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+    </div>
+    <div class="field"><label>Data</label><input type="date" id="mcData"></div>
+    <div class="field-row">
+      <div class="field" style="margin-bottom:0"><label>Início</label><input type="time" id="mcHorario" onchange="mcAutoFim()"></div>
+      <div class="field" style="margin-bottom:0"><label>Término</label><input type="time" id="mcHorarioFim"></div>
+    </div>
+    <div class="field" id="mcRecorrenciaWrap" style="margin-top:16px">
+      <label>Repetir</label>
+      <select id="mcRecorrencia" onchange="mcToggleRecorrencia()">
+        <option value="nunca">Não se repete</option>
+        <option value="semanal">Toda semana</option>
+        <option value="quinzenal">A cada 2 semanas</option>
+        <option value="mensal">Todo mês</option>
+      </select>
+      <span class="hint" id="mcRecorrenciaHint" style="display:none">As sessões se repetem até o paciente ser marcado como inativo.</span>
+    </div>
+    <div class="field">
+      <label>Valor (R$)</label>
+      <input type="number" id="mcValor" placeholder="280" step="0.01" min="0">
+    </div>
+    <div class="field" id="mcAplicarWrap" style="display:none;margin-top:4px">
+      <label class="mc-check">
+        <input type="checkbox" id="mcAplicarFuturas">
+        <span>Aplicar as alterações às próximas consultas deste paciente (desta data em diante)</span>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm" id="mcBtnRemover" style="color:var(--red);border-color:var(--red-bg);display:none;margin-right:auto" onclick="removerConsultaDoModal()">Excluir</button>
+      <button class="btn-outline" onclick="closeModal('modalConsulta')">Cancelar</button>
+      <button class="btn-save" id="mcBtnSalvar" onclick="salvarConsulta()">Agendar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Remarcar -->
+<div class="modal-overlay" id="modalRemarcar">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalRemarcar')">✕</button>
+    <h3>Remarcar consulta</h3>
+    <p class="modal-sub">A consulta atual será marcada como Remarcada e uma nova será criada.</p>
+    <div class="field-row">
+      <div class="field" style="margin-bottom:0"><label>Nova data</label><input type="date" id="remarcarData"></div>
+      <div class="field" style="margin-bottom:0"><label>Novo horário</label><input type="time" id="remarcarHorario"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal('modalRemarcar')">Cancelar</button>
+      <button class="btn-save" onclick="confirmarRemarcar()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Paciente -->
+<div class="modal-overlay" id="modalEditarPaciente">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close" onclick="closeModal('modalEditarPaciente')">✕</button>
+    <input type="hidden" id="epId">
+    <h3>Editar paciente</h3>
+    <p class="modal-sub">Todas as alterações serão salvas imediatamente.</p>
+    <div class="field"><label>Nome completo</label><input type="text" id="epNome" placeholder="Nome do paciente"></div>
+    <div class="field-row">
+      <div class="field" style="margin-bottom:0"><label>E-mail</label><input type="email" id="epEmail" placeholder="paciente@example.com"></div>
+      <div class="field" style="margin-bottom:0"><label>Telefone</label><input type="tel" id="epTelefone" placeholder="(11) 99999-9999" oninput="fmtTelefone(this)" maxlength="15"></div>
+    </div>
+    <div class="field-row" style="margin-top:16px">
+      <div class="field" style="margin-bottom:0"><label>Data de nascimento</label><input type="date" id="epNascimento"></div>
+      <div class="field" style="margin-bottom:0"><label>Valor da consulta (R$)</label><input type="number" id="epValor" placeholder="0,00" step="0.01" min="0"></div>
+    </div>
+    <div class="field" style="margin-top:16px"><label>Status</label>
+      <select id="epStatus" onchange="epToggleInativo()">
+        <option value="ativo">Ativo</option>
+        <option value="inativo">Inativo</option>
+      </select>
+    </div>
+    <div class="field" id="epInativoWrap" style="display:none">
+      <label>Inativo a partir de</label>
+      <input type="date" id="epInativoDesde">
+      <span class="hint">As sessões agendadas nesta data ou depois serão removidas do calendário.</span>
+    </div>
+    <div class="field"><label>Observações</label><textarea id="epObs" placeholder="Motivo do atendimento, contexto..." style="min-height:80px"></textarea></div>
+    <p class="hint" style="margin-bottom:0">Alterações de valor valem apenas para consultas futuras.</p>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal('modalEditarPaciente')">Cancelar</button>
+      <button class="btn-save" onclick="salvarEdicaoPaciente()">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Despesa -->
+<div class="modal-overlay" id="modalDespesa">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modalDespesa')">✕</button>
+    <h3>Nova despesa</h3>
+    <p class="modal-sub">Registre um custo do consultório.</p>
+    <div class="field"><label>Descrição</label><input type="text" id="despDesc" placeholder="Ex: Aluguel da sala"></div>
+    <div class="field"><label>Categoria</label>
+      <select id="despCat">
+        <option>Aluguel</option><option>Materiais</option><option>Equipamentos</option>
+        <option>Cursos/Supervisão</option><option>Software</option><option>Marketing</option><option>Outros</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field" style="margin-bottom:0"><label>Data</label><input type="date" id="despData"></div>
+      <div class="field" style="margin-bottom:0"><label>Valor (R$)</label><input type="number" id="despValor" placeholder="0,00" step="0.01" min="0"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal('modalDespesa')">Cancelar</button>
+      <button class="btn-save" onclick="salvarDespesa()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal detalhamento financeiro (receita / despesas) -->
+<div class="modal-overlay" id="modalFinDetalhe">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeModal('modalFinDetalhe')">✕</button>
+    <h3 id="finDetTitulo"></h3>
+    <p class="modal-sub" id="finDetSub"></p>
+    <div id="finDetBody"></div>
+    <div class="modal-actions"><button class="btn-save" onclick="closeModal('modalFinDetalhe')">Fechar</button></div>
+  </div>
+</div>
+
+<!-- Menu de contexto (botão direito na consulta) -->
+<div class="ctx-menu" id="ctxMenu"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════
+//  ESTADO
+// ════════════════════════════════════════════
+const hoje = new Date();
+let mesAtual = hoje.getMonth(), anoAtual = hoje.getFullYear();
+let agendaView = 'semana';
+let agendaRef = new Date(hoje);  // referência da agenda
+let finView = 'mes';             // Financeiro: semana | mes | ano | custom
+let finRef = new Date(hoje);     // referência do período financeiro
+let finRangeDe = '', finRangeAte = '';
+let finChartHit = [];            // hit-test do gráfico (tooltip)
+let finChartBound = false;
+let agendaPacFiltro = '';        // filtro de paciente na Agenda
+let sessaoCopiada = null;        // clipboard de sessão (copiar/colar)
+let finNFPac = '';               // filtro de paciente nas Notas Fiscais
+let mostrarInativos = false;     // exibir pacientes inativos na barra lateral
+let pacSidebarCollapsed = false; // barra lateral de pacientes recolhida
+let dashFiltroId = '';
+let remarcarId = null;
+let pacSelecionadoId = null;
+
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MESES_ABR = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const DIAS_SEMANA = ['SEG','TER','QUA','QUI','SEX','SÁB','DOM'];
+
+const RECORRENCIA_MESES = 12; // horizonte da recorrência "sem fim" (até o paciente ser inativado)
+const COR_SESSAO = {agendada:'we-blue', concluida:'we-green', faltou:'we-red', pagamento:'we-gold', cancelado:'we-gray'};
+const DOT_COR    = {agendada:'dot-blue', concluida:'dot-green', faltou:'dot-red', pagamento:'dot-gold', cancelado:'dot-gray'};
+const pad = n => String(n).padStart(2,'0');
+
+// ════════════════════════════════════════════
+//  STORAGE
+// ════════════════════════════════════════════
+function load(k) { try { return JSON.parse(localStorage.getItem('sereno-demo:' + k)) || []; } catch { return []; } }
+function loadObj(k, d={}) { try { return JSON.parse(localStorage.getItem('sereno-demo:' + k)) || d; } catch { return d; } }
+function save(k, v) { localStorage.setItem('sereno-demo:' + k, JSON.stringify(v)); }
+
+// ════════════════════════════════════════════
+//  MIGRAÇÃO
+// ════════════════════════════════════════════
+function migrar() {
+  const c = load('consultas'); let a = false;
+  c.forEach(x => {
+    if (!x.statusSessao) { x.statusSessao = x.pagamento === 'pagou' ? 'realizada' : 'agendada'; a = true; }
+    if (!x.horario) { x.horario = ''; a = true; }
+    if (x.horarioFim === undefined) { x.horarioFim = x.horario ? addMin(x.horario, 50) : ''; a = true; }
+    if (!x.nf) { x.nf = 'falta-emitir'; a = true; }
+    if (!x.procedimento) { x.procedimento = 'Sessão de terapia'; a = true; }
+    // migrar status antigos para novos
+    if (x.statusSessao === 'realizada') { x.statusSessao = 'concluida'; a = true; }
+    if (x.statusSessao === 'remarcada') { x.statusSessao = 'agendada'; a = true; }
+    if (x.pagamento === 'pagou') { x.statusSessao = 'pagamento'; a = true; }
+    // migrar nf antigo
+    if (x.nf === 'falta-faturar' || x.nf === 'faturada' || x.nf === 'isenta') { x.nf = x.nf === 'faturada' || x.nf === 'isenta' ? 'emitida' : 'falta-emitir'; a = true; }
+  });
+  if (a) save('consultas', c);
+  const p = load('pacientes'); let b = false;
+  p.forEach(x => {
+    if (!x.status) { x.status = 'ativo'; b = true; }
+    if (!x.email) { x.email = ''; b = true; }
+    if (!x.telefone) { x.telefone = ''; b = true; }
+    if (!x.nascimento) { x.nascimento = ''; b = true; }
+    if (!x.obs) { x.obs = ''; b = true; }
+  });
+  if (b) save('pacientes', p);
+}
+
+// ════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast ' + type + ' show';
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ════════════════════════════════════════════
+//  PERFIL
+// ════════════════════════════════════════════
+function carregarPerfil() {
+  const p = loadObj('perfil', {nome:'Profissional Demo', crp:'Consultório demonstrativo'});
+  document.getElementById('hdrNome').textContent = p.nome || 'Profissional Demo';
+  document.getElementById('hdrCrp').textContent = p.crp || 'Consultório demonstrativo';
+  document.getElementById('hdrAvatar').textContent = (p.nome || 'H')[0].toUpperCase();
+}
+function salvarPerfil() {
+  save('perfil', {nome: document.getElementById('cfgNome').value.trim(), crp: document.getElementById('cfgCrp').value.trim()});
+  carregarPerfil();
+  if (document.getElementById('cfgNome')) renderHome();
+  toast('Perfil atualizado!');
+}
+
+// ── Home (aba Pacientes) ──
+function mostrarHome() {
+  pacSelecionadoId = null;
+  renderPacList();
+  document.getElementById('pacHomeBtn')?.classList.add('active');
+  renderHome();
+}
+function renderHome() {
+  const perfil = loadObj('perfil', {nome:'Profissional Demo', crp:'Consultório demonstrativo'});
+  const pacs = load('pacientes');
+  const ativos = pacs.filter(p => p.status === 'ativo').length;
+  const m = hoje.getMonth(), y = hoje.getFullYear();
+  const doMes = load('consultas').filter(c => { const d = new Date(c.data+'T00:00:00'); return d.getMonth()===m && d.getFullYear()===y; });
+  const realizadas = doMes.filter(c => ['concluida','pagamento','faltou'].includes(c.statusSessao)).length;
+  const totalSes = realizadas + doMes.filter(c => c.statusSessao==='agendada').length;
+  const ini = ((perfil.nome || 'H').trim()[0] || 'H').toUpperCase();
+  const detail = document.getElementById('pacDetail'); if (!detail) return;
+  detail.innerHTML = `
+    <div class="pac-card">
+      <div class="pac-profile">
+        <div class="pac-avatar-lg">${ini}</div>
+        <div class="pac-profile-info">
+          <h3>${esc(perfil.nome || 'Profissional Demo')}</h3>
+          <div class="pac-profile-meta"><span>${esc(perfil.crp || '')}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="pac-fin-cards" style="grid-template-columns:1fr 1fr">
+      <div class="pac-fin-card">
+        <div class="pfc-label">Pacientes ativos</div>
+        <div class="pfc-value cv-g">${ativos}</div>
+      </div>
+      <div class="pac-fin-card">
+        <div class="pfc-label">Sessões de ${MESES[m]}</div>
+        <div class="pfc-value" style="display:flex;align-items:baseline;gap:4px"><span>${realizadas}</span><span style="font-size:16px;font-weight:400;color:var(--text-3)">/${totalSes}</span></div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px">realizadas / totais</div>
+      </div>
+    </div>
+    <div class="cad-stat" style="max-width:440px">
+      <div class="cad-stat-label" style="font-weight:600;margin-bottom:12px">Perfil da psicóloga</div>
+      <div class="field" style="margin-bottom:10px"><label>Nome</label><input type="text" id="cfgNome" value="${esc(perfil.nome||'')}" placeholder="Profissional Demo"></div>
+      <div class="field" style="margin-bottom:12px"><label>Especialidade / CRP</label><input type="text" id="cfgCrp" value="${esc(perfil.crp||'')}" placeholder="Consultório demonstrativo"></div>
+      <button class="btn-save" style="width:100%;justify-content:center" onclick="salvarPerfil()">Salvar perfil</button>
+    </div>`;
+}
+function togglePacSidebar() {
+  pacSidebarCollapsed = !pacSidebarCollapsed;
+  document.getElementById('pacSidebar').classList.toggle('collapsed', pacSidebarCollapsed);
+  document.getElementById('pacLayout').classList.toggle('collapsed', pacSidebarCollapsed);
+  const btn = document.getElementById('pacCollapseBtn');
+  if (btn) btn.textContent = pacSidebarCollapsed ? '›' : '‹';
+}
+
+// ════════════════════════════════════════════
+//  NAVEGAÇÃO
+// ════════════════════════════════════════════
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  pg.style.display = ''; pg.classList.add('active'); btn.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  else if (id === 'agenda') renderAgenda();
+  else if (id === 'pacientes') renderPacientes();
+  else if (id === 'financeiro') renderFinanceiro();
+}
+
+// ════════════════════════════════════════════
+//  MODAIS
+// ════════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function abrirModalDespesa() {
+  document.getElementById('despData').value = hoje.toISOString().split('T')[0];
+  document.getElementById('despDesc').value = '';
+  document.getElementById('despValor').value = '';
+  document.getElementById('modalDespesa').classList.add('open');
+}
+function abrirModalConsulta(data='', horario='') {
+  document.getElementById('mcEditId').value = '';
+  document.getElementById('mcTitulo').textContent = 'Novo agendamento';
+  document.getElementById('modalConsultaSub').textContent = 'Agende uma consulta para um paciente.';
+  document.getElementById('mcBtnSalvar').textContent = 'Agendar';
+  document.getElementById('mcBtnRemover').style.display = 'none';
+  document.getElementById('mcStatusWrap').style.display = 'none';
+  document.getElementById('mcAplicarWrap').style.display = 'none';
+  document.getElementById('mcAplicarFuturas').checked = false;
+  document.getElementById('mcNovoLink').style.display = 'inline-block';
+  document.getElementById('mcRecorrenciaWrap').style.display = 'block';
+  document.getElementById('mcRecorrencia').value = 'nunca';
+  document.getElementById('mcRecorrenciaHint').style.display = 'none';
+  document.getElementById('mcBusca').value = '';
+  document.getElementById('mcPaciente').value = '';
+  document.getElementById('mcData').value = data || hoje.toISOString().split('T')[0];
+  document.getElementById('mcHorario').value = horario || '';
+  document.getElementById('mcHorarioFim').value = horario ? addMin(horario, 50) : '';
+  document.getElementById('mcValor').value = '';
+  document.getElementById('modalConsulta').classList.add('open');
+}
+
+// ════════════════════════════════════════════
+//  FORMATO
+// ════════════════════════════════════════════
+function fmt(v) { return 'R$ ' + (v||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmtData(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('-'); return d+'/'+m+'/'+y; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function bSessao(s) {
+  const mc = {agendada:'bb', realizada:'bg', faltou:'bred', remarcada:'bpurple'};
+  const ml = {agendada:'Agendada', realizada:'Realizada', faltou:'Faltou', remarcada:'Remarcada'};
+  return `<span class="badge ${mc[s]||'bgray'}">${ml[s]||s}</span>`;
+}
+function bPag(s) {
+  return s === 'pagou' ? `<span class="badge bg">Pagou</span>` : `<span class="badge bgold">Pendente</span>`;
+}
+function bNF(s) {
+  const m = {faturada:'bg', 'falta-faturar':'bgold', emitida:'bg', 'nao-emitida':'bgray', isenta:'bb'};
+  const l = {faturada:'Faturada', 'falta-faturar':'Falta faturar', emitida:'Emitida', 'nao-emitida':'Não emitida', isenta:'Isenta'};
+  return `<span class="badge ${m[s]||'bgray'}">${l[s]||s}</span>`;
+}
+
+// ════════════════════════════════════════════
+//  CONSULTA – CRUD
+// ════════════════════════════════════════════
+function mcAcSearch() {
+  const q = document.getElementById('mcBusca').value.toLowerCase();
+  const pacs = load('pacientes').filter(p => p.status !== 'inativo' && p.nome.toLowerCase().includes(q));
+  const list = document.getElementById('mcAcList');
+  if (!pacs.length) { list.classList.remove('open'); return; }
+  list.innerHTML = pacs.map(p =>
+    `<div class="ac-item" onmousedown="mcAcSel('${p.id}','${esc(p.nome)}',${p.valor})">${esc(p.nome)}<small style="margin-left:6px">R$ ${p.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</small></div>`
+  ).join('');
+  list.classList.add('open');
+}
+function mcAcSel(id, nome, valor) {
+  document.getElementById('mcBusca').value = nome;
+  document.getElementById('mcPaciente').value = id;
+  document.getElementById('mcValor').value = valor;
+  document.getElementById('mcAcList').classList.remove('open');
+}
+
+function salvarConsulta() {
+  const editId = document.getElementById('mcEditId').value;
+  const pid = document.getElementById('mcPaciente').value;
+  const data = document.getElementById('mcData').value;
+  const horario = document.getElementById('mcHorario').value;
+  const horarioFim = document.getElementById('mcHorarioFim').value;
+  const valorRaw = parseFloat(document.getElementById('mcValor').value);
+  if (!pid || !data) { toast('Selecione paciente e data.', 'error'); return; }
+  if (horario && horarioFim && horarioFim <= horario) { toast('O término deve ser após o início.', 'error'); return; }
+  const pac = load('pacientes').find(p => p.id === pid); if (!pac) return;
+  const valor = isNaN(valorRaw) ? pac.valor : valorRaw;
+  const list = load('consultas');
+
+  // ── Edição de uma consulta existente ──
+  if (editId) {
+    const i = list.findIndex(x => x.id === editId); if (i < 0) return;
+    const orig = list[i];
+    // Detectar quais campos propagáveis mudaram (valor, início, término)
+    const mudou = {};
+    if (valor !== orig.valor)                     mudou.valor = valor;
+    if ((horario||'') !== (orig.horario||''))     mudou.horario = horario||'';
+    if ((horarioFim||'') !== (orig.horarioFim||'')) mudou.horarioFim = horarioFim||'';
+
+    list[i] = { ...orig, pacienteId: pid, nome: pac.nome, valor,
+      data, horario: horario||'', horarioFim: horarioFim||'',
+      statusSessao: document.getElementById('mcStatus').value };
+
+    // Aplicar as mesmas alterações às próximas consultas do paciente (desta data em diante)
+    let propagadas = 0;
+    const aplicarFuturas = document.getElementById('mcAplicarFuturas').checked;
+    if (aplicarFuturas && Object.keys(mudou).length) {
+      list.forEach((x, idx) => {
+        if (idx !== i && x.pacienteId === pid && x.data >= data) {
+          Object.assign(x, mudou); propagadas++;
+        }
+      });
+    }
+    save('consultas', list);
+    closeModal('modalConsulta');
+    toast(propagadas > 0 ? `Consulta e mais ${propagadas} atualizada(s)!` : 'Consulta atualizada!');
+    renderAgenda(); renderDashboard(); renderDashHist();
+    if (pacSelecionadoId) renderPacDetalhe(pacSelecionadoId);
+    return;
+  }
+
+  // ── Novo agendamento (recorrência sem fim, até o paciente ser inativado) ──
+  const rec = document.getElementById('mcRecorrencia').value;
+  const recId = rec === 'nunca' ? null : 'r' + Date.now();
+  const base = Date.now();
+  const novaConsulta = (idNum, dataK) => ({
+    id: idNum.toString(), pacienteId: pid, nome: pac.nome, valor,
+    data: dataK, horario: horario||'', horarioFim: horarioFim||'',
+    statusSessao: 'agendada', pagamento: 'pendente', nf: 'falta-emitir', recorrenciaId: recId });
+
+  let criadas = 0;
+  if (rec === 'nunca') {
+    list.push(novaConsulta(base, data)); criadas = 1;
+  } else {
+    const horizonte = addMonthsISO(data, RECORRENCIA_MESES);
+    for (let k = 0; k < 600; k++) {
+      let dataK;
+      if (k === 0)                  dataK = data;
+      else if (rec === 'semanal')   dataK = addDaysISO(data, 7 * k);
+      else if (rec === 'quinzenal') dataK = addDaysISO(data, 14 * k);
+      else                          dataK = addMonthsISO(data, k);
+      if (dataK > horizonte) break;
+      list.push(novaConsulta(base + k, dataK)); criadas++;
+    }
+  }
+  save('consultas', list);
+  closeModal('modalConsulta');
+  toast(criadas > 1 ? `${criadas} sessões recorrentes criadas!` : 'Consulta agendada!');
+  renderAgenda(); renderDashboard(); renderDashHist();
+}
+
+function excluirConsulta(id, ctx) {
+  if (!confirm('Remover esta consulta?')) return;
+  save('consultas', load('consultas').filter(c => c.id !== id));
+  toast('Consulta removida.');
+  if (ctx === 'agenda') renderAgenda();
+  else if (ctx === 'paciente') renderPacDetalhe(pacSelecionadoId);
+  else { renderDashboard(); renderDashHist(); }
+}
+
+function alterarCampo(id, campo, valor, ctx) {
+  const c = load('consultas'); const i = c.findIndex(x => x.id === id); if (i < 0) return;
+  c[i][campo] = valor; save('consultas', c);
+  const msgs = { statusSessao:'Status atualizado!', pagamento: valor==='pagou'?'Pagamento confirmado!':'Marcado como pendente.', nf:'NF atualizada.' };
+  toast(msgs[campo] || 'Atualizado!');
+  if (ctx === 'agenda') renderAgenda();
+  else if (ctx === 'paciente') renderPacDetalhe(pacSelecionadoId);
+  else if (ctx === 'financeiro') renderFinanceiro();
+  else { renderDashboard(); renderDashHist(); }
+}
+
+function abrirRemarcar(id) {
+  remarcarId = id;
+  document.getElementById('remarcarData').value = '';
+  document.getElementById('remarcarHorario').value = '';
+  document.getElementById('modalRemarcar').classList.add('open');
+}
+function confirmarRemarcar() {
+  const novaData = document.getElementById('remarcarData').value;
+  const novaHorario = document.getElementById('remarcarHorario').value;
+  if (!novaData) { toast('Informe a nova data.', 'error'); return; }
+  const c = load('consultas'); const i = c.findIndex(x => x.id === remarcarId); if (i < 0) return;
+  const orig = c[i];
+  // Atualizar a própria consulta com a nova data/horário (sem criar duplicata)
+  c[i] = { ...orig, data: novaData, horario: novaHorario || orig.horario, statusSessao: 'agendada', pagamento: 'pendente', nf: 'falta-emitir' };
+  save('consultas', c);
+  closeModal('modalRemarcar'); toast('Consulta remarcada!');
+  renderAgenda(); renderDashboard(); renderDashHist();
+  if (pacSelecionadoId) renderPacDetalhe(pacSelecionadoId);
+}
+
+// ════════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════════
+function changeMonth(d) {
+  mesAtual += d;
+  if (mesAtual < 0) { mesAtual = 11; anoAtual--; }
+  if (mesAtual > 11) { mesAtual = 0; anoAtual++; }
+  renderDashboard(); renderDashHist();
+}
+function pickMonth(v) {
+  if (!v) return; const [y,m] = v.split('-'); anoAtual = +y; mesAtual = +m - 1;
+  renderDashboard(); renderDashHist();
+}
+
+function renderDashboard() {
+  document.getElementById('monthLabel').textContent = MESES[mesAtual] + ' ' + anoAtual;
+  document.getElementById('monthPicker').value = `${anoAtual}-${pad(mesAtual+1)}`;
+  const todas = load('consultas');
+  let doMes = todas.filter(c => {
+    const d = new Date(c.data + 'T00:00:00');
+    return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+  });
+  const recPago    = doMes.filter(c => c.statusSessao==='pagamento').reduce((s,c) => s+c.valor, 0);
+  const recAberto  = doMes.filter(c => c.statusSessao==='concluida' || c.statusSessao==='faltou').reduce((s,c) => s+c.valor, 0);
+  const recPrev    = doMes.filter(c => c.statusSessao==='agendada').reduce((s,c) => s+c.valor, 0);
+  const sesConcl   = doMes.filter(c => c.statusSessao==='concluida' || c.statusSessao==='pagamento' || c.statusSessao==='faltou').length;
+  const sesAg      = doMes.filter(c => c.statusSessao==='agendada').length;
+  const sesTotal   = sesConcl + sesAg;
+  document.getElementById('dashCards').innerHTML = `
+    <div class="card"><div class="card-top"><div class="card-icon ci-g">↑</div><span class="card-tag">Mês</span></div><div class="card-label">Receita realizada</div><div class="card-value cv-g">${fmt(recPago)}</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">pagamentos confirmados</div></div>
+    <div class="card"><div class="card-top"><div class="card-icon" style="background:var(--red-bg);color:var(--red)">!</div><span class="card-tag">Mês</span></div><div class="card-label">Em aberto</div><div class="card-value cv-gold">${fmt(recAberto)}</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">concluídas, aguardando pagto</div></div>
+    <div class="card"><div class="card-top"><div class="card-icon ci-gold" style="font-size:13px">🕐</div><span class="card-tag">Mês</span></div><div class="card-label">Receita prevista</div><div class="card-value cv-b">${fmt(recPrev)}</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">sessões agendadas</div></div>
+    <div class="card"><div class="card-top"><div class="card-icon ci-g">✓</div><span class="card-tag">Mês</span></div><div class="card-label">Sessões</div><div class="card-value" style="display:flex;align-items:baseline;gap:4px"><span>${sesConcl}</span><span style="font-size:15px;font-weight:400;color:var(--text-3)">/${sesTotal}</span></div><div style="font-size:11px;color:var(--text-3);margin-top:4px">concluídas / total</div></div>`;
+
+  // Atualizar select de pacientes no filtro do histórico
+  popularFiltrosPaciente();
+}
+
+function alterarNFGrupo(ids, novo, sel) {
+  const c = load('consultas');
+  ids.forEach(id => { const i = c.findIndex(x => x.id === id); if (i >= 0) c[i].nf = novo; });
+  save('consultas', c); sel.className = 'ss ss-' + novo;
+  toast('NF atualizada.');
+}
+function excluirGrupo(ids) {
+  if (!confirm('Remover todas as consultas deste paciente no mês?')) return;
+  save('consultas', load('consultas').filter(c => !ids.includes(c.id)));
+  renderDashboard(); renderDashHist(); toast('Consultas removidas.');
+}
+function irParaPaciente(id) {
+  pacSelecionadoId = id;
+  document.querySelectorAll('.nav-btn').forEach(b => { if (b.textContent.trim() === 'Pacientes') b.click(); });
+  setTimeout(() => { renderPacDetalhe(id); highlightPacItem(id); }, 100);
+}
+
+// Histórico inline dashboard — nova lógica
+function popularFiltrosPaciente() {
+  const sel = document.getElementById('dashHistPaciente'); if (!sel) return;
+  const pacs = load('pacientes').sort((a,b) => a.nome.localeCompare(b.nome));
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Todos os pacientes</option>' +
+    pacs.map(p => `<option value="${p.id}" ${cur===p.id?'selected':''}>${esc(p.nome)}</option>`).join('');
+}
+
+function renderDashHist() {
+  popularFiltrosPaciente();
+  const busca   = (document.getElementById('dashHistNome')?.value || '').toLowerCase();
+  const pacId   = document.getElementById('dashHistPaciente')?.value || '';
+  const sessao  = document.getElementById('dashHistSessao')?.value || '';
+
+  // Filtrar apenas pelo mês atual do dashboard
+  let lista = load('consultas').filter(c => {
+    const d = new Date(c.data + 'T00:00:00');
+    return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+  });
+  if (busca)  lista = lista.filter(c => c.nome.toLowerCase().includes(busca));
+  if (pacId)  lista = lista.filter(c => c.pacienteId === pacId);
+  if (sessao) lista = lista.filter(c => c.statusSessao === sessao);
+
+  lista.sort((a,b) => {
+    const dc = a.data.localeCompare(b.data);
+    if (dc !== 0) return dc;
+    return (a.horario||'').localeCompare(b.horario||'');
+  });
+
+  const tbody = document.getElementById('tabelaHistDash');
+  if (!lista.length) { tbody.innerHTML = '<tr class="empty"><td colspan="6">Nenhuma consulta encontrada.</td></tr>'; return; }
+
+  tbody.innerHTML = lista.map(c => `<tr>
+    <td>${fmtData(c.data)}</td>
+    <td>${faixaHorario(c)}</td>
+    <td style="font-weight:600">${esc(c.nome)}</td>
+    <td>${fmt(c.valor)}</td>
+    <td>
+      <select class="ss ss-${c.statusSessao}" onchange="alterarCampo('${c.id}','statusSessao',this.value,'dash');this.className='ss ss-'+this.value;renderDashHist()">
+        <option value="agendada"  ${c.statusSessao==='agendada' ?'selected':''}>Agendada</option>
+        <option value="concluida" ${c.statusSessao==='concluida'?'selected':''}>Concluída</option>
+        <option value="faltou"    ${c.statusSessao==='faltou'   ?'selected':''}>Paciente Faltou</option>
+        <option value="pagamento" ${c.statusSessao==='pagamento'?'selected':''}>Pagamento Realizado</option>
+        <option value="cancelado" ${c.statusSessao==='cancelado'?'selected':''}>Cancelado</option>
+      </select>
+    </td>
+    <td>
+      <button class="btn-sm" onclick="abrirRemarcar('${c.id}')">Remarcar</button>
+    </td>
+  </tr>`).join('');
+}
+
+function addMin(horario, min) {
+  if (!horario) return '';
+  const [h, m] = horario.split(':').map(Number);
+  const total = h * 60 + m + min;
+  return pad(Math.floor(total/60) % 24) + ':' + pad(total % 60);
+}
+function addDaysISO(iso, days) {
+  const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+function addMonthsISO(iso, months) {
+  const d = new Date(iso + 'T00:00:00'); d.setMonth(d.getMonth() + months);
+  return d.toISOString().split('T')[0];
+}
+function faixaHorario(c) {
+  if (!c.horario) return '—';
+  const fim = c.horarioFim || addMin(c.horario, 50);
+  return c.horario + ' – ' + fim;
+}
+
+// ════════════════════════════════════════════
+//  AGENDA
+// ════════════════════════════════════════════
+function setAgendaView(v) {
+  agendaView = v;
+  ['dia','semana','mes','ano'].forEach(x => {
+    const b = document.getElementById('btn' + x.charAt(0).toUpperCase() + x.slice(1));
+    if (b) b.classList.toggle('active', x === v);
+  });
+  renderAgenda();
+}
+function navAgenda(d) {
+  if (agendaView === 'dia')         agendaRef.setDate(agendaRef.getDate() + d);
+  else if (agendaView === 'semana') agendaRef.setDate(agendaRef.getDate() + d * 7);
+  else if (agendaView === 'mes')    agendaRef.setMonth(agendaRef.getMonth() + d);
+  else if (agendaView === 'ano')    agendaRef.setFullYear(agendaRef.getFullYear() + d);
+  renderAgenda();
+}
+function goToToday() { agendaRef = new Date(hoje); renderAgenda(); }
+
+// Filtro de paciente da Agenda
+function consultasAgenda() {
+  const all = load('consultas');
+  return agendaPacFiltro ? all.filter(c => c.pacienteId === agendaPacFiltro) : all;
+}
+function popularAgendaPacFiltro() {
+  const sel = document.getElementById('agendaPacFiltro'); if (!sel) return;
+  const pacs = load('pacientes').sort((a,b) => a.nome.localeCompare(b.nome));
+  sel.innerHTML = '<option value="">Todos os pacientes</option>' +
+    pacs.map(p => `<option value="${p.id}" ${agendaPacFiltro===p.id?'selected':''}>${esc(p.nome)}</option>`).join('');
+}
+function setAgendaPacFiltro(v) { agendaPacFiltro = v; renderAgenda(); }
+
+function renderAgenda() {
+  popularAgendaPacFiltro();
+  if (agendaView === 'dia')         renderDia();
+  else if (agendaView === 'semana') renderSemana();
+  else if (agendaView === 'mes')    renderMes();
+  else                              renderAno();
+}
+
+// ── Semana ──
+function getSegundaDaSemana(d) {
+  const dt = new Date(d);
+  const dia = dt.getDay(); // 0=dom
+  const diff = dia === 0 ? -6 : 1 - dia;
+  dt.setDate(dt.getDate() + diff);
+  return dt;
+}
+function renderSemana() {
+  const seg = getSegundaDaSemana(agendaRef);
+  const dias = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(seg); d.setDate(seg.getDate() + i);
+    dias.push(d);
+  }
+  const isoSeg = dias[0].toISOString().split('T')[0];
+  const isoDom = dias[6].toISOString().split('T')[0];
+  const labelMes = dias[0].getMonth() === dias[6].getMonth()
+    ? MESES[dias[0].getMonth()] + ' ' + dias[0].getFullYear()
+    : MESES_ABR[dias[0].getMonth()] + ' – ' + MESES[dias[6].getMonth()] + ' ' + dias[6].getFullYear();
+
+  document.getElementById('agendaTitleLabel').textContent =
+    `${dias[0].getDate()} – ${dias[6].getDate()} De ${MESES[dias[6].getMonth()]} ${dias[6].getFullYear()}`;
+
+  const consultas = consultasAgenda().filter(c => c.data >= isoSeg && c.data <= isoDom);
+  const horas = [];
+  for (let h = 7; h <= 22; h++) horas.push(h);
+
+  // header
+  let headerCells = `<div class="week-header-cell" style="border-right:1px solid var(--border-light)"></div>`;
+  dias.forEach((d, i) => {
+    const isToday = d.toISOString().split('T')[0] === hoje.toISOString().split('T')[0];
+    headerCells += `<div class="week-header-cell">${DIAS_SEMANA[i]}<span class="week-day-num ${isToday?'today-num':''}">${d.getDate()}</span></div>`;
+  });
+
+  // body
+  let timeCells = '';
+  horas.forEach(h => { timeCells += `<div class="time-slot">${pad(h)}:00</div>`; });
+
+  let dayCols = '';
+  dias.forEach(d => {
+    const iso = d.toISOString().split('T')[0];
+    const dosDia = consultas.filter(c => c.data === iso).sort((a,b) => (a.horario||'').localeCompare(b.horario||''));
+    let slotsHtml = horas.map(h =>
+      `<div class="day-slot" onclick="abrirModalConsulta('${iso}','${pad(h)}:00')" oncontextmenu="abrirCtxColar('${iso}','${pad(h)}:00',event)"></div>`
+    ).join('');
+    // eventos posicionados
+    let evHtml = agendaEventosHtml(dosDia);
+    dayCols += `<div class="day-col">${slotsHtml}${evHtml}</div>`;
+  });
+
+  document.getElementById('agendaView').innerHTML = `
+    <div class="week-grid">
+      <div class="week-header">${headerCells}</div>
+      <div class="week-body">
+        <div class="time-col">${timeCells}</div>
+        ${dayCols}
+      </div>
+    </div>`;
+}
+
+// Gera o HTML dos eventos posicionados (usado nas visões Dia e Semana)
+function agendaEventosHtml(dosDia) {
+  let html = '';
+  dosDia.forEach(ev => {
+    if (!ev.horario) return;
+    const [hh, mm] = ev.horario.split(':').map(Number);
+    const topPx = (hh - 7) * 56 + (mm / 60) * 56;
+    let durMin = 50;
+    if (ev.horarioFim) {
+      const [fh, fm] = ev.horarioFim.split(':').map(Number);
+      durMin = Math.max(24, (fh * 60 + fm) - (hh * 60 + mm));
+    }
+    const hPx = durMin / 60 * 56;
+    const cor = COR_SESSAO[ev.statusSessao] || 'we-green';
+    const fimTxt = ev.horarioFim ? '–' + ev.horarioFim : '';
+    html += `<div class="week-event ${cor}" style="top:${topPx}px;height:${hPx}px" onclick="abrirEditarConsulta('${ev.id}',event)" oncontextmenu="abrirCtxMenu('${ev.id}',event)">
+      <span>${ev.horario}${fimTxt} · ${esc(ev.nome)}</span>
+    </div>`;
+  });
+  return html;
+}
+
+// ── Dia ──
+function renderDia() {
+  const d = new Date(agendaRef);
+  const iso = d.toISOString().split('T')[0];
+  const isToday = iso === hoje.toISOString().split('T')[0];
+  const diaSem = DIAS_SEMANA[(d.getDay() + 6) % 7];
+  document.getElementById('agendaTitleLabel').textContent =
+    `${d.getDate()} De ${MESES[d.getMonth()]} ${d.getFullYear()}`;
+
+  const dosDia = consultasAgenda().filter(c => c.data === iso)
+    .sort((a,b) => (a.horario||'').localeCompare(b.horario||''));
+  const horas = [];
+  for (let h = 7; h <= 22; h++) horas.push(h);
+
+  const timeCells = horas.map(h => `<div class="time-slot">${pad(h)}:00</div>`).join('');
+  const slotsHtml = horas.map(h => `<div class="day-slot" onclick="abrirModalConsulta('${iso}','${pad(h)}:00')" oncontextmenu="abrirCtxColar('${iso}','${pad(h)}:00',event)"></div>`).join('');
+  const evHtml = agendaEventosHtml(dosDia);
+
+  document.getElementById('agendaView').innerHTML = `
+    <div class="week-grid">
+      <div class="week-header" style="grid-template-columns:56px 1fr">
+        <div class="week-header-cell" style="border-right:1px solid var(--border-light)"></div>
+        <div class="week-header-cell">${diaSem}<span class="week-day-num ${isToday?'today-num':''}">${d.getDate()}</span></div>
+      </div>
+      <div class="week-body" style="grid-template-columns:56px 1fr">
+        <div class="time-col">${timeCells}</div>
+        <div class="day-col">${slotsHtml}${evHtml}</div>
+      </div>
+    </div>`;
+}
+
+// ── Mês ──
+function renderMes() {
+  const ano = agendaRef.getFullYear(), mes = agendaRef.getMonth();
+  document.getElementById('agendaTitleLabel').textContent = MESES[mes] + ' ' + ano;
+  const primDia = new Date(ano, mes, 1).getDay(); // 0=dom
+  const diasMes = new Date(ano, mes+1, 0).getDate();
+  const consultas = consultasAgenda();
+  const primSeg = primDia === 0 ? -6 : 1 - primDia; // offset para segunda
+
+  let cells = '';
+  const totalCells = 42;
+  for (let i = 0; i < totalCells; i++) {
+    const dayOffset = i + primSeg;
+    const d = new Date(ano, mes, 1 + dayOffset);
+    const iso = d.toISOString().split('T')[0];
+    const isCurrentMonth = d.getMonth() === mes;
+    const isToday = iso === hoje.toISOString().split('T')[0];
+    const dosDia = consultas.filter(c => c.data === iso).sort((a,b) => (a.horario||'').localeCompare(b.horario||''));
+
+    let evs = dosDia.slice(0,3).map(ev => {
+      const cor = DOT_COR[ev.statusSessao] || 'dot-green';
+      return `<div class="mc-event" onclick="abrirEditarConsulta('${ev.id}',event)" oncontextmenu="abrirCtxMenu('${ev.id}',event)"><span class="mc-dot ${cor}"></span>${ev.horario ? ev.horario + ' ' : ''}${esc(ev.nome)}</div>`;
+    }).join('');
+    if (dosDia.length > 3) evs += `<div style="font-size:10px;color:var(--text-3)">+${dosDia.length-3} mais</div>`;
+
+    cells += `<div class="month-cell ${isCurrentMonth?'':'other-m'} ${isToday?'mc-today':''}" onclick="${isCurrentMonth?`clickMesDay('${iso}')`:''}" ${isCurrentMonth?`oncontextmenu="abrirCtxColar('${iso}','',event)"`:''}>
+      <span class="mc-num">${d.getDate()}</span>${evs}
+    </div>`;
+  }
+
+  document.getElementById('agendaView').innerHTML = `
+    <div class="month-grid-wrap">
+      <div class="month-dow-row">
+        ${DIAS_SEMANA.map(d=>`<div class="month-dow">${d}</div>`).join('')}
+      </div>
+      <div class="month-weeks">${cells}</div>
+    </div>`;
+}
+function clickMesDay(iso) { abrirModalConsulta(iso, ''); }
+
+// ── Ano ──
+function renderAno() {
+  const ano = agendaRef.getFullYear();
+  document.getElementById('agendaTitleLabel').textContent = ano;
+  const consultas = consultasAgenda();
+  const diasComConsulta = new Set(consultas.filter(c => c.data.slice(0,4) === String(ano)).map(c => c.data));
+  const hojeIso = hoje.toISOString().split('T')[0];
+  const DOW = ['S','T','Q','Q','S','S','D'];
+
+  let html = '<div class="year-grid">';
+  for (let m = 0; m < 12; m++) {
+    const primDia = new Date(ano, m, 1).getDay(); // 0=dom
+    const offset = primDia === 0 ? -6 : 1 - primDia; // alinhar semana começando na segunda
+    const diasMes = new Date(ano, m+1, 0).getDate();
+    let cells = '';
+    for (let i = 0; i < 42; i++) {
+      const dayNum = i + offset + 1;
+      if (dayNum < 1 || dayNum > diasMes) { cells += '<div class="ym-day empty"></div>'; continue; }
+      const iso = `${ano}-${pad(m+1)}-${pad(dayNum)}`;
+      const cls = (iso === hojeIso ? 'ym-today ' : '') + (diasComConsulta.has(iso) ? 'ym-has' : '');
+      cells += `<div class="ym-day ${cls}" onclick="abrirDiaFromAno('${iso}')">${dayNum}</div>`;
+    }
+    html += `<div class="year-month">
+      <div class="ym-title" onclick="abrirMesFromAno(${m})">${MESES[m]}</div>
+      <div class="ym-dow">${DOW.map(x => `<span>${x}</span>`).join('')}</div>
+      <div class="ym-grid">${cells}</div>
+    </div>`;
+  }
+  html += '</div>';
+  document.getElementById('agendaView').innerHTML = html;
+}
+function abrirMesFromAno(m) { agendaRef = new Date(agendaRef.getFullYear(), m, 1); setAgendaView('mes'); }
+function abrirDiaFromAno(iso) { agendaRef = new Date(iso + 'T00:00:00'); setAgendaView('dia'); }
+
+// ── Editor de consulta (clique numa sessão agendada) ──
+function abrirEditarConsulta(id, e) {
+  if (e) e.stopPropagation();
+  const c = load('consultas').find(x => x.id === id); if (!c) return;
+  document.getElementById('mcEditId').value = id;
+  document.getElementById('mcTitulo').textContent = 'Editar consulta';
+  document.getElementById('modalConsultaSub').textContent = c.nome;
+  document.getElementById('mcBtnSalvar').textContent = 'Salvar';
+  document.getElementById('mcBtnRemover').style.display = 'inline-flex';
+  document.getElementById('mcNovoLink').style.display = 'none';
+  document.getElementById('mcRecorrenciaWrap').style.display = 'none';
+  document.getElementById('mcStatusWrap').style.display = 'block';
+  const ss = document.getElementById('mcStatus');
+  ss.value = c.statusSessao; ss.className = 'ss ss-' + c.statusSessao;
+  document.getElementById('mcBusca').value = c.nome;
+  document.getElementById('mcPaciente').value = c.pacienteId;
+  document.getElementById('mcData').value = c.data;
+  document.getElementById('mcHorario').value = c.horario || '';
+  document.getElementById('mcHorarioFim').value = c.horarioFim || (c.horario ? addMin(c.horario, 50) : '');
+  document.getElementById('mcValor').value = c.valor;
+  // Mostrar "aplicar às próximas" só se houver outras consultas deste paciente nesta data em diante
+  const temFuturas = load('consultas').some(x => x.pacienteId === c.pacienteId && x.id !== id && x.data >= c.data);
+  document.getElementById('mcAplicarFuturas').checked = false;
+  document.getElementById('mcAplicarWrap').style.display = temFuturas ? 'block' : 'none';
+  document.getElementById('modalConsulta').classList.add('open');
+}
+function removerConsultaDoModal() {
+  const id = document.getElementById('mcEditId').value;
+  const all = load('consultas'); const c = all.find(x => x.id === id); if (!c) return;
+  let novo;
+  if (c.recorrenciaId) {
+    if (confirm('Esta consulta faz parte de uma série recorrente.\n\nOK = remover toda a série\nCancelar = remover apenas esta sessão')) {
+      novo = all.filter(x => x.recorrenciaId !== c.recorrenciaId);
+    } else {
+      novo = all.filter(x => x.id !== id);
+    }
+  } else {
+    if (!confirm('Remover esta consulta?')) return;
+    novo = all.filter(x => x.id !== id);
+  }
+  save('consultas', novo);
+  closeModal('modalConsulta'); toast('Consulta removida.');
+  renderAgenda(); renderDashboard(); renderDashHist();
+  if (pacSelecionadoId) renderPacDetalhe(pacSelecionadoId);
+}
+
+// ── Auxiliares do modal de consulta ──
+function mcAutoFim() {
+  const ini = document.getElementById('mcHorario').value;
+  const fim = document.getElementById('mcHorarioFim');
+  if (ini && !fim.value) fim.value = addMin(ini, 50);
+}
+function mcToggleRecorrencia() {
+  const v = document.getElementById('mcRecorrencia').value;
+  document.getElementById('mcRecorrenciaHint').style.display = v === 'nunca' ? 'none' : 'block';
+}
+function irNovoPacienteDaConsulta() {
+  closeModal('modalConsulta');
+  const btn = [...document.querySelectorAll('.nav-btn')].find(b => b.textContent.trim() === 'Pacientes');
+  if (btn) btn.click();
+  setTimeout(() => abrirModalNovoPaciente(), 120);
+}
+
+// ── Menu de contexto (botão direito numa consulta) ──
+let ctxConsultaId = null;
+const CTX_STATUS = [
+  {v:'agendada',  label:'Agendada',            dot:'dot-blue'},
+  {v:'concluida', label:'Concluída',           dot:'dot-green'},
+  {v:'faltou',    label:'Paciente Faltou',     dot:'dot-red'},
+  {v:'pagamento', label:'Pagamento Realizado', dot:'dot-gold'},
+  {v:'cancelado', label:'Cancelado',           dot:'dot-gray'}
+];
+function abrirCtxMenu(id, e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  const c = load('consultas').find(x => x.id === id); if (!c) return;
+  ctxConsultaId = id;
+  const temFuturasPac = load('consultas').some(x => x.pacienteId === c.pacienteId && x.id !== id && x.data >= c.data);
+  const menu = document.getElementById('ctxMenu');
+  menu.innerHTML =
+    `<div class="ctx-menu-head">Status da sessão</div>` +
+    CTX_STATUS.map(s => `<div class="ctx-menu-item" onclick="ctxSetStatus('${s.v}')">
+      <span class="ctx-dot ${s.dot}"></span>${s.label}${c.statusSessao === s.v ? '<span class="ctx-check">✓</span>' : ''}
+    </div>`).join('') +
+    `<div class="ctx-sep"></div>
+     <div class="ctx-menu-item" onclick="copiarSessao()">⧉&nbsp; Copiar sessão</div>
+     <div class="ctx-sep"></div>
+     <div class="ctx-menu-item danger" onclick="ctxExcluir()">✕&nbsp; Excluir consulta</div>` +
+    (temFuturasPac ? `<div class="ctx-menu-item danger" onclick="ctxExcluirFuturas()">✕&nbsp; Excluir esta e as próximas deste paciente</div>` : '');
+  menu.classList.add('open');
+  // posicionar sem estourar a janela
+  const mw = menu.offsetWidth, mh = menu.offsetHeight;
+  let x = e.clientX, y = e.clientY;
+  if (x + mw > window.innerWidth - 8)  x = window.innerWidth - mw - 8;
+  if (y + mh > window.innerHeight - 8) y = window.innerHeight - mh - 8;
+  menu.style.left = x + 'px';
+  menu.style.top  = y + 'px';
+}
+function fecharCtxMenu() {
+  const m = document.getElementById('ctxMenu');
+  if (m) m.classList.remove('open');
+  ctxConsultaId = null;
+}
+function ctxSetStatus(v) {
+  if (!ctxConsultaId) return;
+  alterarCampo(ctxConsultaId, 'statusSessao', v, 'agenda');
+  fecharCtxMenu();
+}
+function ctxExcluir() {
+  if (!ctxConsultaId) return;
+  save('consultas', load('consultas').filter(c => c.id !== ctxConsultaId));
+  fecharCtxMenu();
+  toast('Consulta removida.');
+  renderAgenda(); renderDashboard(); renderDashHist();
+  if (pacSelecionadoId) renderPacDetalhe(pacSelecionadoId);
+}
+function ctxExcluirFuturas() {
+  if (!ctxConsultaId) return;
+  const all = load('consultas');
+  const c = all.find(x => x.id === ctxConsultaId); if (!c) return;
+  const restantes = all.filter(x => !(x.pacienteId === c.pacienteId && x.data >= c.data));
+  const removidas = all.length - restantes.length;
+  if (!confirm(`Excluir ${removidas} consulta(s) de ${c.nome}, de ${fmtData(c.data)} em diante?\n\nEsta ação não pode ser desfeita.`)) return;
+  save('consultas', restantes);
+  fecharCtxMenu();
+  toast(`${removidas} consulta(s) removida(s).`);
+  renderAgenda(); renderDashboard(); renderDashHist();
+  if (pacSelecionadoId) renderPacDetalhe(pacSelecionadoId);
+}
+// ── Copiar / colar sessão ──
+function copiarSessao() {
+  const c = load('consultas').find(x => x.id === ctxConsultaId); if (!c) { fecharCtxMenu(); return; }
+  sessaoCopiada = { pacienteId: c.pacienteId, nome: c.nome, valor: c.valor, horario: c.horario, horarioFim: c.horarioFim };
+  fecharCtxMenu();
+  toast('Sessão copiada. Botão direito num horário para colar.');
+}
+function abrirCtxColar(iso, hora, e) {
+  if (!sessaoCopiada) return;              // sem nada copiado → menu padrão do navegador
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  const menu = document.getElementById('ctxMenu');
+  menu.innerHTML =
+    `<div class="ctx-menu-head">Colar sessão</div>
+     <div class="ctx-menu-item" onclick="colarSessao('${iso}','${hora||''}')"><span class="ctx-dot dot-blue"></span>Colar: ${esc(sessaoCopiada.nome)}</div>
+     <div class="ctx-sep"></div>
+     <div class="ctx-menu-item" onclick="sessaoCopiada=null;fecharCtxMenu()">Limpar cópia</div>`;
+  menu.classList.add('open');
+  const mw = menu.offsetWidth, mh = menu.offsetHeight;
+  let x = e.clientX, y = e.clientY;
+  if (x + mw > window.innerWidth - 8)  x = window.innerWidth - mw - 8;
+  if (y + mh > window.innerHeight - 8) y = window.innerHeight - mh - 8;
+  menu.style.left = x + 'px'; menu.style.top = y + 'px';
+}
+function colarSessao(iso, hora) {
+  const s = sessaoCopiada; if (!s) { fecharCtxMenu(); return; }
+  const horario = hora || s.horario || '';
+  let horarioFim = s.horarioFim || '';
+  if (horario && s.horario && s.horarioFim) {
+    const dur = (parseInt(s.horarioFim.slice(0,2))*60 + parseInt(s.horarioFim.slice(3))) - (parseInt(s.horario.slice(0,2))*60 + parseInt(s.horario.slice(3)));
+    horarioFim = addMin(horario, dur);
+  } else if (horario && !horarioFim) {
+    horarioFim = addMin(horario, 50);
+  }
+  const list = load('consultas');
+  list.push({ id: Date.now().toString(), pacienteId: s.pacienteId, nome: s.nome, valor: s.valor,
+    data: iso, horario, horarioFim, statusSessao: 'agendada', pagamento: 'pendente', nf: 'falta-emitir' });
+  save('consultas', list);
+  fecharCtxMenu();
+  toast('Sessão colada!');
+  renderAgenda(); renderDashboard(); renderDashHist();
+  if (pacSelecionadoId) renderPacDetalhe(pacSelecionadoId);
+}
+
+// fechar o menu ao clicar fora, rolar ou apertar Esc
+document.addEventListener('click', fecharCtxMenu);
+document.addEventListener('scroll', fecharCtxMenu, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { fecharCtxMenu(); sessaoCopiada = null; } });
+
+// ════════════════════════════════════════════
+//  PACIENTES
+// ════════════════════════════════════════════
+function renderPacientes() {
+  renderPacList();
+  if (pacSelecionadoId) { renderPacDetalhe(pacSelecionadoId); highlightPacItem(pacSelecionadoId); }
+  else mostrarHome();
+}
+function renderPacList() {
+  const q = (document.getElementById('pacSearch')?.value || '').toLowerCase();
+  let pacs = load('pacientes');
+  if (q) pacs = pacs.filter(p => p.nome.toLowerCase().includes(q));
+  pacs.sort((a,b) => a.nome.localeCompare(b.nome));
+  const ativos   = pacs.filter(p => p.status !== 'inativo');
+  const inativos = pacs.filter(p => p.status === 'inativo');
+  const el = document.getElementById('pacList'); if (!el) return;
+  if (!ativos.length && !inativos.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-style:italic;font-size:13px">Nenhum paciente encontrado</div>';
+    return;
+  }
+  const item = p => `
+    <div class="pac-item ${pacSelecionadoId===p.id?'active':''}" onclick="selecionarPac('${p.id}')" title="${esc(p.nome)}">
+      <div class="pac-avatar">${p.nome[0].toUpperCase()}</div>
+      <div class="pac-item-info">
+        <strong>${esc(p.nome)}</strong>
+        <span>${p.telefone || p.email || (p.status==='inativo'?'Inativo':'Ativo')}</span>
+      </div>
+    </div>`;
+  let html = ativos.length ? ativos.map(item).join('')
+    : '<div style="padding:16px;text-align:center;color:var(--text-3);font-style:italic;font-size:12px">Nenhum paciente ativo</div>';
+  if (inativos.length) {
+    html += `<button class="pac-inativos-toggle" onclick="mostrarInativos=!mostrarInativos;renderPacList()">${mostrarInativos?'▾':'▸'} Inativos (${inativos.length})</button>`;
+    if (mostrarInativos) html += `<div class="pac-inativos">${inativos.map(item).join('')}</div>`;
+  }
+  el.innerHTML = html;
+}
+function selecionarPac(id) {
+  pacSelecionadoId = id;
+  document.getElementById('pacHomeBtn')?.classList.remove('active');
+  renderPacList();
+  renderPacDetalhe(id);
+}
+function highlightPacItem(id) {
+  document.querySelectorAll('.pac-item').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('onclick')?.includes(id));
+  });
+}
+function toggleStatusPaciente(id) {
+  const lista = load('pacientes'); const i = lista.findIndex(p => p.id === id); if (i < 0) return;
+  if (lista[i].status === 'ativo') {
+    const desde = hoje.toISOString().split('T')[0];
+    if (!confirm(`Inativar ${lista[i].nome}?\n\nAs sessões de ${fmtData(desde)} em diante serão removidas do calendário.`)) return;
+    lista[i].status = 'inativo'; lista[i].inativoDesde = desde;
+    const consultas = load('consultas');
+    const restantes = consultas.filter(c => !(c.pacienteId === id && c.data >= desde));
+    const removidas = consultas.length - restantes.length;
+    if (removidas > 0) save('consultas', restantes);
+    save('pacientes', lista);
+    toast(removidas > 0 ? `Paciente inativado · ${removidas} sessão(ões) removida(s).` : 'Paciente inativado.');
+  } else {
+    lista[i].status = 'ativo'; delete lista[i].inativoDesde;
+    save('pacientes', lista);
+    toast('Paciente reativado.');
+  }
+  renderPacList(); renderPacDetalhe(id); renderAgenda(); renderDashboard(); renderDashHist();
+}
+function renderPacDetalhe(id) {
+  const pac = load('pacientes').find(p => p.id === id);
+  if (!pac) return;
+  const detail = document.getElementById('pacDetail');
+
+  // filtro de mês
+  const mesFiltro = document.getElementById('pacMesFiltro')?.value || '';
+
+  const todas = load('consultas').filter(c => c.pacienteId === id);
+  let filtradas = todas;
+  if (mesFiltro) filtradas = filtradas.filter(c => c.data.slice(0,7) === mesFiltro);
+
+  const pago    = filtradas.filter(c => c.statusSessao==='pagamento').reduce((s,c) => s+c.valor, 0);
+  const aberto  = filtradas.filter(c => c.statusSessao==='concluida' || c.statusSessao==='faltou').reduce((s,c) => s+c.valor, 0);
+  const previsto = filtradas.filter(c => c.statusSessao==='agendada').reduce((s,c) => s+c.valor, 0);
+
+  // histórico ordenado
+  const hist = [...filtradas].sort((a,b) => b.data.localeCompare(a.data));
+
+  const nascFormatado = pac.nascimento ? fmtData(pac.nascimento) : '—';
+
+  detail.innerHTML = `
+    <div class="pac-card">
+      <div class="pac-profile">
+        <div class="pac-avatar-lg">${pac.nome[0].toUpperCase()}</div>
+        <div class="pac-profile-info">
+          <h3>${esc(pac.nome)}</h3>
+          <div class="pac-profile-meta">
+            ${pac.email ? `<span>✉ ${esc(pac.email)}</span>` : ''}
+            ${pac.telefone ? `<span>☎ ${esc(pac.telefone)}</span>` : ''}
+            ${pac.nascimento ? `<span>🗓 ${nascFormatado}</span>` : ''}
+            <span><button class="badge badge-btn ${pac.status==='ativo'?'bg':'bgray'}" onclick="toggleStatusPaciente('${id}')" title="Clique para alterar o status">${pac.status==='ativo'?'● Ativo':'○ Inativo'}</button></span>
+          </div>
+          ${pac.obs ? `<div class="pac-notes">📋 ${esc(pac.obs)}</div>` : ''}
+        </div>
+        <button class="btn-sm" style="margin-left:auto;align-self:flex-start" onclick="editarPacModal('${id}')">Editar</button>
+      </div>
+    </div>
+
+    <div class="pac-month-filter">
+      <label>Filtrar por período:</label>
+      <input type="month" id="pacMesFiltro" class="fi" style="width:155px" value="${mesFiltro}" onchange="renderPacDetalhe('${id}')">
+      ${mesFiltro ? `<button class="btn-sm" onclick="document.getElementById('pacMesFiltro').value='';renderPacDetalhe('${id}')">Limpar</button>` : ''}
+      <span style="font-size:11px;color:var(--text-3)">${mesFiltro ? '' : '(exibindo toda a vida do paciente)'}</span>
+    </div>
+
+    <div class="pac-fin-cards">
+      <div class="pac-fin-card">
+        <div class="pfc-label">Pago</div>
+        <div class="pfc-value cv-g">${fmt(pago)}</div>
+      </div>
+      <div class="pac-fin-card">
+        <div class="pfc-label">Em aberto</div>
+        <div class="pfc-value cv-gold">${fmt(aberto)}</div>
+      </div>
+      <div class="pac-fin-card">
+        <div class="pfc-label">Previsto</div>
+        <div class="pfc-value cv-b">${fmt(previsto)}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px">🗓 Prontuário &amp; histórico</div>
+      <div class="bulk-btns">
+        <button class="btn-sm" onclick="marcarSessoesPaciente('${id}','concluida')">✓ Marcar concluídas</button>
+        <button class="btn-sm" onclick="marcarSessoesPaciente('${id}','pagamento')">$ Marcar pagas</button>
+        <button class="btn-novo" style="padding:7px 14px;font-size:12px" onclick="abrirConsultaPaciente('${id}')">+ Agendar</button>
+      </div>
+    </div>
+    ${hist.length === 0
+      ? `<div style="text-align:center;color:var(--text-3);font-style:italic;padding:28px">Nenhuma consulta encontrada.</div>`
+      : hist.map(c => `
+      <div class="pac-hist-item">
+        <div class="phi-left">
+          <h4>Sessão</h4>
+          <p>${fmtData(c.data)} · ${faixaHorario(c)}</p>
+        </div>
+        <div class="phi-right">
+          <span class="phi-valor">${fmt(c.valor)}</span>
+          <select class="ss ss-${c.statusSessao}" onchange="alterarCampo('${c.id}','statusSessao',this.value,'paciente');this.className='ss ss-'+this.value;renderPacDetalhe('${id}')">
+            <option value="agendada"  ${c.statusSessao==='agendada' ?'selected':''}>Agendada</option>
+            <option value="concluida" ${c.statusSessao==='concluida'?'selected':''}>Concluída</option>
+            <option value="faltou"    ${c.statusSessao==='faltou'   ?'selected':''}>Paciente Faltou</option>
+            <option value="pagamento" ${c.statusSessao==='pagamento'?'selected':''}>Pagamento Realizado</option>
+            <option value="cancelado" ${c.statusSessao==='cancelado'?'selected':''}>Cancelado</option>
+          </select>
+          <select class="ss ss-${c.nf}" onchange="alterarCampo('${c.id}','nf',this.value,'paciente');this.className='ss ss-'+this.value;renderPacDetalhe('${id}')">
+            <option value="falta-emitir" ${c.nf==='falta-emitir'?'selected':''}>Falta Emitir</option>
+            <option value="emitida"      ${c.nf==='emitida'     ?'selected':''}>Emitida</option>
+          </select>
+          <button class="btn-del" onclick="excluirConsulta('${c.id}','paciente')">✕</button>
+        </div>
+      </div>`).join('')
+    }`;
+}
+
+function marcarSessoesPaciente(id, novoStatus) {
+  const mesFiltro = document.getElementById('pacMesFiltro')?.value || '';
+  const rotulo = novoStatus === 'pagamento' ? 'pagas' : 'concluídas';
+  const c = load('consultas');
+  let n = 0;
+  c.forEach(x => {
+    if (x.pacienteId !== id) return;
+    if (x.statusSessao === 'faltou' || x.statusSessao === 'cancelado') return; // não mexe nessas
+    if (mesFiltro && x.data.slice(0,7) !== mesFiltro) return;                   // respeita o período visível
+    if (x.statusSessao !== novoStatus) { x.statusSessao = novoStatus; n++; }
+  });
+  if (n === 0) { toast('Nenhuma sessão para atualizar.'); return; }
+  save('consultas', c);
+  toast(`${n} sessão(ões) marcada(s) como ${rotulo}.`);
+  renderPacDetalhe(id); renderDashboard(); renderDashHist();
+}
+
+function abrirConsultaPaciente(pacId) {
+  const pac = load('pacientes').find(p => p.id === pacId); if (!pac) return;
+  abrirModalConsulta('', '');
+  document.getElementById('mcBusca').value = pac.nome;
+  document.getElementById('mcPaciente').value = pacId;
+  document.getElementById('mcValor').value = pac.valor;
+  document.getElementById('modalConsultaSub').textContent = `Agendando para ${pac.nome}`;
+}
+
+function editarPacModal(id) {
+  const pac = load('pacientes').find(p => p.id === id); if (!pac) return;
+  // Preencher campos do modal de edição
+  document.getElementById('epId').value = id;
+  document.getElementById('epNome').value = pac.nome || '';
+  document.getElementById('epEmail').value = pac.email || '';
+  document.getElementById('epTelefone').value = pac.telefone || '';
+  document.getElementById('epNascimento').value = pac.nascimento || '';
+  document.getElementById('epValor').value = pac.valor || '';
+  document.getElementById('epStatus').value = pac.status || 'ativo';
+  document.getElementById('epInativoDesde').value = pac.inativoDesde || hoje.toISOString().split('T')[0];
+  document.getElementById('epObs').value = pac.obs || '';
+  epToggleInativo();
+  document.getElementById('modalEditarPaciente').classList.add('open');
+}
+function epToggleInativo() {
+  const inativo = document.getElementById('epStatus').value === 'inativo';
+  document.getElementById('epInativoWrap').style.display = inativo ? 'block' : 'none';
+  if (inativo && !document.getElementById('epInativoDesde').value) {
+    document.getElementById('epInativoDesde').value = hoje.toISOString().split('T')[0];
+  }
+}
+function salvarEdicaoPaciente() {
+  const id = document.getElementById('epId').value;
+  const nome = document.getElementById('epNome').value.trim();
+  const valor = parseFloat(document.getElementById('epValor').value);
+  const tel = document.getElementById('epTelefone').value.trim();
+  const digTel = tel.replace(/\D/g, '');
+  if (!nome || isNaN(valor) || valor <= 0) { toast('Preencha nome e valor.', 'error'); return; }
+  if (tel && digTel.length !== 11) { toast('Telefone deve ter 11 dígitos.', 'error'); return; }
+  const lista = load('pacientes');
+  const i = lista.findIndex(p => p.id === id); if (i < 0) return;
+  const statusNovo = document.getElementById('epStatus').value;
+  lista[i] = { ...lista[i],
+    nome, valor,
+    email: document.getElementById('epEmail').value.trim(),
+    telefone: tel,
+    nascimento: document.getElementById('epNascimento').value,
+    status: statusNovo,
+    obs: document.getElementById('epObs').value.trim()
+  };
+
+  // Ao inativar: remover as sessões deste paciente da data de inatividade em diante
+  let removidas = 0;
+  if (statusNovo === 'inativo') {
+    const desde = document.getElementById('epInativoDesde').value || hoje.toISOString().split('T')[0];
+    lista[i].inativoDesde = desde;
+    const consultas = load('consultas');
+    const restantes = consultas.filter(c => !(c.pacienteId === id && c.data >= desde));
+    removidas = consultas.length - restantes.length;
+    if (removidas > 0) save('consultas', restantes);
+  } else {
+    delete lista[i].inativoDesde; // reativado: volta ao normal
+  }
+
+  save('pacientes', lista);
+  closeModal('modalEditarPaciente');
+  toast(removidas > 0 ? `Paciente inativado · ${removidas} sessão(ões) removida(s).` : 'Paciente atualizado!');
+  renderPacList();
+  renderPacDetalhe(id);
+  renderAgenda(); renderDashboard(); renderDashHist();
+}
+
+// ════════════════════════════════════════════
+//  MÁSCARA TELEFONE
+// ════════════════════════════════════════════
+function fmtTelefone(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length === 0) { el.value = ''; return; }
+  if (v.length <= 2)       el.value = '(' + v;
+  else if (v.length <= 7)  el.value = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else if (v.length <= 11) el.value = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+}
+
+// ════════════════════════════════════════════
+//  MODAL NOVO PACIENTE (aba Pacientes)
+// ════════════════════════════════════════════
+function abrirModalNovoPaciente() {
+  ['npNome','npEmail','npTelefone','npValor','npObs'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('npNascimento').value = '';
+  document.getElementById('modalNovoPaciente').classList.add('open');
+}
+function salvarNovoPacienteModal() {
+  const nome = document.getElementById('npNome').value.trim();
+  const valor = parseFloat(document.getElementById('npValor').value);
+  const tel = document.getElementById('npTelefone').value.trim();
+  const digitos = tel.replace(/\D/g, '');
+  if (!nome || isNaN(valor) || valor <= 0) { toast('Preencha nome e valor.', 'error'); return; }
+  if (tel && digitos.length !== 11) { toast('Telefone deve ter 11 dígitos.', 'error'); return; }
+  const lista = load('pacientes');
+  if (lista.some(p => p.nome.toLowerCase() === nome.toLowerCase())) { toast('Paciente já cadastrado.', 'error'); return; }
+  const novo = { id: Date.now().toString(), nome, valor, status: 'ativo',
+    email: document.getElementById('npEmail').value.trim(),
+    telefone: tel,
+    nascimento: document.getElementById('npNascimento').value,
+    obs: document.getElementById('npObs').value.trim() };
+  lista.push(novo);
+  save('pacientes', lista);
+  closeModal('modalNovoPaciente');
+  toast('Paciente cadastrado!');
+  renderPacList();
+  selecionarPac(novo.id);
+}
+function dashAcSearch() {
+  const q = document.getElementById('dashFiltroNome').value.toLowerCase();
+  const pacs = {};
+  load('consultas').filter(c => { const d = new Date(c.data+'T00:00:00'); return d.getMonth()===mesAtual && d.getFullYear()===anoAtual; })
+    .forEach(c => pacs[c.pacienteId] = c.nome);
+  const list = document.getElementById('dashAcList');
+  const m = Object.entries(pacs).filter(([,n]) => n.toLowerCase().includes(q));
+  if (!m.length || !q) { list.classList.remove('open'); return; }
+  list.innerHTML = m.map(([id,n]) => `<div class="ac-item" onmousedown="dashAcSel('${id}','${esc(n)}')">${esc(n)}</div>`).join('');
+  list.classList.add('open');
+}
+function dashAcSel(id, nome) {
+  document.getElementById('dashFiltroNome').value = nome; dashFiltroId = id;
+  document.getElementById('dashAcList').classList.remove('open'); renderDashboard();
+}
+function dashAcClose() { document.getElementById('dashAcList').classList.remove('open'); }
+
+// ════════════════════════════════════════════
+//  DESPESAS
+// ════════════════════════════════════════════
+function salvarDespesa() {
+  const desc = document.getElementById('despDesc').value.trim();
+  const cat  = document.getElementById('despCat').value;
+  const data = document.getElementById('despData').value;
+  const valor = parseFloat(document.getElementById('despValor').value);
+  if (!desc || !data || isNaN(valor) || valor <= 0) { toast('Preencha todos os campos.', 'error'); return; }
+  const list = load('despesas');
+  list.push({ id: Date.now().toString(), descricao: desc, categoria: cat, data, valor });
+  save('despesas', list); closeModal('modalDespesa'); toast('Despesa salva!'); renderFinanceiro();
+}
+function excluirDespesa(id) {
+  if (!confirm('Remover esta despesa?')) return;
+  save('despesas', load('despesas').filter(d => d.id !== id));
+  renderFinanceiro(); toast('Despesa removida.');
+}
+
+// ════════════════════════════════════════════
+//  FINANCEIRO
+// ════════════════════════════════════════════
+// ── Período do Financeiro ──
+function toISO(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function finPeriodo() {
+  if (finView === 'custom' && finRangeDe && finRangeAte) {
+    const ini = finRangeDe <= finRangeAte ? finRangeDe : finRangeAte;
+    const fim = finRangeDe <= finRangeAte ? finRangeAte : finRangeDe;
+    return { ini, fim, label: 'De ' + fmtData(ini) + ' a ' + fmtData(fim) };
+  }
+  if (finView === 'semana') {
+    const seg = getSegundaDaSemana(finRef); const dom = new Date(seg); dom.setDate(seg.getDate()+6);
+    return { ini: toISO(seg), fim: toISO(dom),
+      label: seg.getDate() + ' ' + MESES_ABR[seg.getMonth()] + ' – ' + dom.getDate() + ' ' + MESES_ABR[dom.getMonth()] + ' ' + dom.getFullYear() };
+  }
+  if (finView === 'ano') {
+    const y = finRef.getFullYear();
+    return { ini: y + '-01-01', fim: y + '-12-31', label: 'Ano de ' + y };
+  }
+  const y = finRef.getFullYear(), m = finRef.getMonth();
+  const ultimo = new Date(y, m+1, 0).getDate();
+  return { ini: y + '-' + pad(m+1) + '-01', fim: y + '-' + pad(m+1) + '-' + pad(ultimo), label: MESES[m] + ' ' + y };
+}
+function updateFinBtns() {
+  ['semana','mes','ano'].forEach(x => {
+    const b = document.getElementById('finBtn' + cap(x));
+    if (b) b.classList.toggle('active', finView === x);
+  });
+}
+function setFinView(v) { finView = v; updateFinBtns(); document.getElementById('finRangeClear').style.display='none'; renderFinanceiro(); }
+function navFin(d) {
+  if (finView === 'custom') { finView = 'mes'; updateFinBtns(); document.getElementById('finRangeClear').style.display='none'; }
+  if (finView === 'semana')   finRef.setDate(finRef.getDate() + d*7);
+  else if (finView === 'ano') finRef.setFullYear(finRef.getFullYear() + d);
+  else                        finRef.setMonth(finRef.getMonth() + d);
+  renderFinanceiro();
+}
+function finHoje() {
+  finRef = new Date(hoje);
+  if (finView === 'custom') { finView = 'mes'; updateFinBtns(); document.getElementById('finRangeClear').style.display='none'; }
+  renderFinanceiro();
+}
+function setFinRange() {
+  finRangeDe = document.getElementById('finDe').value;
+  finRangeAte = document.getElementById('finAte').value;
+  if (finRangeDe && finRangeAte) {
+    finView = 'custom'; updateFinBtns();
+    document.getElementById('finRangeClear').style.display = 'inline-block';
+    renderFinanceiro();
+  }
+}
+function limparFinRange() {
+  finRangeDe = ''; finRangeAte = '';
+  document.getElementById('finDe').value = ''; document.getElementById('finAte').value = '';
+  document.getElementById('finRangeClear').style.display = 'none';
+  finView = 'mes'; updateFinBtns(); renderFinanceiro();
+}
+
+function renderFinanceiro() {
+  const { ini, fim, label } = finPeriodo();
+  document.getElementById('finPeriodoLabel').textContent = 'Período: ' + label;
+  const filtroCat = document.getElementById('finFiltroCat')?.value || '';
+  const consultas = load('consultas');
+  const despesas  = load('despesas');
+  const noPeriodo   = consultas.filter(c => c.data >= ini && c.data <= fim);
+  const despPeriodo = despesas.filter(d => d.data >= ini && d.data <= fim);
+
+  const realizado = noPeriodo.filter(c => c.statusSessao==='pagamento').reduce((s,c) => s+c.valor, 0);
+  const aberto    = noPeriodo.filter(c => c.statusSessao==='concluida' || c.statusSessao==='faltou').reduce((s,c) => s+c.valor, 0);
+  const previsto  = noPeriodo.filter(c => c.statusSessao==='agendada').reduce((s,c) => s+c.valor, 0);
+  const despesaTotal = despPeriodo.reduce((s,d) => s+d.valor, 0);
+  const receitaTotal = realizado + aberto + previsto;
+  const resultado = receitaTotal - despesaTotal;
+
+  document.getElementById('finCards').innerHTML = `
+    <div class="card" style="cursor:pointer" onclick="abrirFinReceita()" title="Ver a divisão da receita"><div class="card-top"><div class="card-icon ci-g">↑</div><span class="card-tag">Ver divisão ›</span></div><div class="card-label">Receita total</div><div class="card-value cv-g">${fmt(receitaTotal)}</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">realizada + em aberto + prevista</div></div>
+    <div class="card" style="cursor:pointer" onclick="abrirFinDespesas()" title="Ver despesas por categoria"><div class="card-top"><div class="card-icon ci-r">↗</div><span class="card-tag">Ver categorias ›</span></div><div class="card-label">Despesas</div><div class="card-value cv-r">${fmt(despesaTotal)}</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">custos do consultório</div></div>
+    <div class="card card-dark" style="cursor:pointer" onclick="abrirFinResultado()" title="Ver detalhe do resultado"><div class="card-top"><div class="card-icon ci-w">$</div><span class="card-tag">Ver detalhe ›</span></div><div class="card-label">Resultado</div><div class="card-value">${resultado<0?'-':''}${fmt(Math.abs(resultado))}</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px">receita total − despesas</div></div>`;
+
+  popularFinNFPac();
+  renderGrafico(consultas, despesas);
+  bindFinChart();
+  renderFinNF(noPeriodo);
+
+  // Despesas do período
+  let lista = [...despPeriodo];
+  if (filtroCat) lista = lista.filter(d => d.categoria === filtroCat);
+  lista.sort((a,b) => b.data.localeCompare(a.data));
+  const tbody = document.getElementById('tabelaDespesas');
+  if (!lista.length) { tbody.innerHTML = '<tr class="empty"><td colspan="5">Nenhuma despesa no período.</td></tr>'; }
+  else tbody.innerHTML = lista.map(d => `<tr>
+    <td style="font-weight:600">${esc(d.descricao)}</td>
+    <td><span class="badge bgray">${esc(d.categoria)}</span></td>
+    <td>${fmtData(d.data)}</td>
+    <td style="color:var(--red);font-weight:600">${fmt(d.valor)}</td>
+    <td><button class="btn-del" onclick="excluirDespesa('${d.id}')">✕</button></td>
+  </tr>`).join('');
+}
+
+// ── Notas fiscais (Financeiro) ──
+const NF_STATUS_LABEL = { concluida:'Concluída', pagamento:'Pagamento Realizado', faltou:'Paciente Faltou' };
+function nfElegivel(c) {
+  // só sessões concluídas / pagas / faltou geram nota; agendadas e canceladas ficam de fora
+  return ['concluida','pagamento','faltou'].includes(c.statusSessao);
+}
+function popularFinNFPac() {
+  const sel = document.getElementById('finNFPacFiltro'); if (!sel) return;
+  const pacs = load('pacientes').sort((a,b) => a.nome.localeCompare(b.nome));
+  sel.innerHTML = '<option value="">Todos os pacientes</option>' +
+    pacs.map(p => `<option value="${p.id}" ${finNFPac===p.id?'selected':''}>${esc(p.nome)}</option>`).join('');
+}
+function setFinNFPac(v) { finNFPac = v; renderFinanceiro(); }
+function renderFinNF(noPeriodo) {
+  let rel = noPeriodo.filter(nfElegivel);
+  if (finNFPac) rel = rel.filter(c => c.pacienteId === finNFPac);
+  rel.sort((a,b) => b.data.localeCompare(a.data));
+  const faltando = rel.filter(c => c.nf !== 'emitida').length;
+  const emitidas = rel.length - faltando;
+  const escopo = finNFPac ? ' (paciente filtrado)' : '';
+  document.getElementById('finNFResumo').textContent = `${faltando} a emitir · ${emitidas} emitida(s)${escopo}`;
+  const btn = document.getElementById('btnMarcarNFs');
+  btn.disabled = faltando === 0;
+  btn.style.opacity = faltando === 0 ? '.5' : '1';
+  const tbody = document.getElementById('tabelaNF');
+  if (!rel.length) { tbody.innerHTML = '<tr class="empty"><td colspan="5">Nenhuma consulta a faturar no período.</td></tr>'; return; }
+  tbody.innerHTML = rel.map(c => `<tr>
+    <td>${fmtData(c.data)}</td>
+    <td style="font-weight:600">${esc(c.nome)}</td>
+    <td>${fmt(c.valor)}</td>
+    <td><span class="badge ss-${c.statusSessao}" style="font-weight:600">${NF_STATUS_LABEL[c.statusSessao]||c.statusSessao}</span></td>
+    <td>
+      <select class="ss ss-${c.nf}" onchange="alterarCampo('${c.id}','nf',this.value,'financeiro');this.className='ss ss-'+this.value">
+        <option value="falta-emitir" ${c.nf==='falta-emitir'?'selected':''}>Falta Emitir</option>
+        <option value="emitida"      ${c.nf==='emitida'     ?'selected':''}>Emitida</option>
+      </select>
+    </td>
+  </tr>`).join('');
+}
+function marcarNFTodasEmitidas() {
+  const { ini, fim } = finPeriodo();
+  const c = load('consultas'); let n = 0;
+  c.forEach(x => {
+    if (x.data < ini || x.data > fim) return;
+    if (!nfElegivel(x)) return;                        // ignora agendadas/canceladas
+    if (finNFPac && x.pacienteId !== finNFPac) return; // respeita o filtro de paciente
+    if (x.nf !== 'emitida') { x.nf = 'emitida'; n++; }
+  });
+  if (n === 0) { toast('Nenhuma nota pendente no período.'); return; }
+  save('consultas', c);
+  toast(`${n} nota(s) marcada(s) como emitida(s).`);
+  renderFinanceiro();
+}
+
+// ── Detalhamento da receita e das despesas (cards clicáveis, gráfico pizza) ──
+function fmtK(v) { return v >= 1000 ? 'R$ ' + (v/1000).toLocaleString('pt-BR',{maximumFractionDigits:1}) + 'k' : fmt(v); }
+function pieDonut(segments, size) {
+  size = size || 176;
+  const total = segments.reduce((s,x)=>s+x.value,0);
+  const r = size/2 - 16, cx = size/2, cy = size/2, C = 2*Math.PI*r;
+  let offset = 0, circles = '';
+  if (total <= 0) {
+    circles = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="26"/>`;
+  } else {
+    segments.forEach(s => {
+      if (s.value <= 0) return;
+      const len = s.value/total * C;
+      circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="26" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+      offset += len;
+    });
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;margin:2px auto 0">
+    ${circles}
+    <text x="${cx}" y="${cy-3}" text-anchor="middle" style="font-size:10px;fill:var(--text-3)">Total</text>
+    <text x="${cx}" y="${cy+14}" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">${fmtK(total)}</text>
+  </svg>`;
+}
+function renderFinPie(titulo, sub, segments) {
+  const total = segments.reduce((s,x)=>s+x.value,0);
+  document.getElementById('finDetTitulo').textContent = titulo;
+  document.getElementById('finDetSub').textContent = sub;
+  const legend = segments.map(s => {
+    const pct = total > 0 ? Math.round(s.value/total*100) : 0;
+    return `<div class="fin-det-row"><span class="fdl"><i style="background:${s.color}"></i>${esc(s.label)} <span style="color:var(--text-3);font-size:11px">${pct}%</span></span><span class="fdv">${fmt(s.value)}</span></div>`;
+  }).join('');
+  document.getElementById('finDetBody').innerHTML =
+    pieDonut(segments)
+    + `<div style="margin-top:16px">${legend}</div>`
+    + `<div class="fin-det-total"><span class="fdl">Total</span><span class="fdv">${fmt(total)}</span></div>`;
+  document.getElementById('modalFinDetalhe').classList.add('open');
+}
+function abrirFinReceita() {
+  const { ini, fim, label } = finPeriodo();
+  const c = load('consultas').filter(x => x.data >= ini && x.data <= fim);
+  const realizada = c.filter(x => x.statusSessao==='pagamento').reduce((s,x)=>s+x.valor,0);
+  const aberto    = c.filter(x => x.statusSessao==='concluida' || x.statusSessao==='faltou').reduce((s,x)=>s+x.valor,0);
+  const previsto  = c.filter(x => x.statusSessao==='agendada').reduce((s,x)=>s+x.valor,0);
+  renderFinPie('Divisão da receita', label, [
+    { label:'Realizada', value:realizada, color:'#6b9470' },
+    { label:'Em aberto (inclui faltas)', value:aberto, color:'#c4a55a' },
+    { label:'Prevista', value:previsto, color:'#6e8fb5' }
+  ]);
+}
+function abrirFinDespesas() {
+  const { ini, fim, label } = finPeriodo();
+  const d = load('despesas').filter(x => x.data >= ini && x.data <= fim);
+  const porCat = {};
+  d.forEach(x => { porCat[x.categoria] = (porCat[x.categoria]||0) + x.valor; });
+  const cores = ['#6b9470','#c4a55a','#6e8fb5','#c47a7a','#9e7ab5','#4e7554','#b8b2a6'];
+  const segs = Object.entries(porCat).sort((a,b) => b[1]-a[1]).map(([cat,v],i) => ({ label:cat, value:v, color:cores[i%cores.length] }));
+  renderFinPie('Despesas por categoria', label, segs);
+}
+function abrirFinResultado() {
+  const { ini, fim, label } = finPeriodo();
+  const c = load('consultas').filter(x => x.data >= ini && x.data <= fim);
+  const realizada = c.filter(x => x.statusSessao==='pagamento').reduce((s,x)=>s+x.valor,0);
+  const aberto    = c.filter(x => x.statusSessao==='concluida' || x.statusSessao==='faltou').reduce((s,x)=>s+x.valor,0);
+  const previsto  = c.filter(x => x.statusSessao==='agendada').reduce((s,x)=>s+x.valor,0);
+  const receitaTotal = realizada + aberto + previsto;
+  const despesa = load('despesas').filter(x => x.data >= ini && x.data <= fim).reduce((s,x)=>s+x.valor,0);
+  const resTotal = receitaTotal - despesa;
+  const resReal = realizada - despesa;
+  document.getElementById('finDetTitulo').textContent = 'Resultado';
+  document.getElementById('finDetSub').textContent = label;
+  const bloco = (titulo, receitaLabel, receita, res) => `
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--text-3);font-weight:600;margin-bottom:6px">${titulo}</div>
+      <div class="fin-det-row" style="padding:6px 0"><span class="fdl">${receitaLabel}</span><span class="fdv cv-g">${fmt(receita)}</span></div>
+      <div class="fin-det-row" style="padding:6px 0"><span class="fdl">− Despesas</span><span class="fdv cv-r">${fmt(despesa)}</span></div>
+      <div class="fin-det-total" style="margin-top:4px"><span class="fdl">= Resultado</span><span class="fdv" style="color:${res<0?'var(--red)':'var(--green-dark)'}">${res<0?'-':''}${fmt(Math.abs(res))}</span></div>
+    </div>`;
+  document.getElementById('finDetBody').innerHTML =
+    bloco('Considerando toda a receita', 'Receita total', receitaTotal, resTotal) +
+    bloco('Considerando só o que já entrou', 'Receita realizada', realizada, resReal);
+  document.getElementById('modalFinDetalhe').classList.add('open');
+}
+
+// ── Tooltip do gráfico ──
+function bindFinChart() {
+  if (finChartBound) return; finChartBound = true;
+  const canvas = document.getElementById('finChart');
+  const tip = document.getElementById('finTooltip');
+  if (!canvas || !tip) return;
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const hit = finChartHit.find(h => x >= h.x0 && x < h.x1);
+    if (!hit || (hit.totalRev === 0 && hit.despesa === 0)) { tip.style.display = 'none'; return; }
+    tip.innerHTML = `<div class="ftt-title">${hit.label}</div>
+      <div class="ftt-row"><span><i style="background:#6e8fb5"></i>Previsto</span><b>${fmt(hit.previsto)}</b></div>
+      <div class="ftt-row"><span><i style="background:#6b9470"></i>Realizado</span><b>${fmt(hit.realizado)}</b></div>
+      <div class="ftt-row"><span><i style="background:#c4a55a"></i>Em aberto</span><b>${fmt(hit.aberto)}</b></div>
+      <div class="ftt-sep"></div>
+      <div class="ftt-row"><span>Receita total</span><b>${fmt(hit.totalRev)}</b></div>
+      <div class="ftt-row"><span><i style="background:#c47a7a"></i>Despesas</span><b>${fmt(hit.despesa)}</b></div>`;
+    tip.style.display = 'block';
+    const box = canvas.parentElement.getBoundingClientRect();
+    let tx = e.clientX - box.left + 14, ty = e.clientY - box.top + 12;
+    if (tx + tip.offsetWidth > box.width) tx = e.clientX - box.left - tip.offsetWidth - 14;
+    if (ty + tip.offsetHeight > box.height) ty = box.height - tip.offsetHeight - 4;
+    tip.style.left = Math.max(2, tx) + 'px'; tip.style.top = Math.max(2, ty) + 'px';
+  });
+  canvas.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+}
+function finMesesGrafico() {
+  const arr = [];
+  if (finView === 'ano') {
+    const y = finRef.getFullYear();
+    for (let m = 0; m < 12; m++) arr.push({ y, m, label: MESES_ABR[m], full: MESES[m] + ' ' + y });
+  } else if (finView === 'custom' && finRangeDe && finRangeAte) {
+    const a = finRangeDe <= finRangeAte ? finRangeDe : finRangeAte;
+    const b = finRangeDe <= finRangeAte ? finRangeAte : finRangeDe;
+    let d = new Date(a + 'T00:00:00'); d.setDate(1);
+    const end = new Date(b + 'T00:00:00');
+    while (d <= end && arr.length < 12) {
+      arr.push({ y: d.getFullYear(), m: d.getMonth(), label: MESES_ABR[d.getMonth()], full: MESES[d.getMonth()] + ' ' + d.getFullYear() });
+      d.setMonth(d.getMonth() + 1);
+    }
+    if (!arr.length) arr.push({ y: end.getFullYear(), m: end.getMonth(), label: MESES_ABR[end.getMonth()], full: MESES[end.getMonth()] + ' ' + end.getFullYear() });
+  } else {
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(finRef.getFullYear(), finRef.getMonth() - i, 1);
+      arr.push({ y: d.getFullYear(), m: d.getMonth(), label: MESES_ABR[d.getMonth()], full: MESES[d.getMonth()] + ' ' + d.getFullYear() });
+    }
+  }
+  return arr;
+}
+
+function renderGrafico(consultas, despesas) {
+  const canvas = document.getElementById('finChart'); if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const wrap = canvas.parentElement;
+  const W = wrap.clientWidth || 600, H = 220;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr); ctx.clearRect(0, 0, W, H);
+
+  const meses = finMesesGrafico();
+  const dados = meses.map(({y,m}) => {
+    const inMonth = c => { const d = new Date(c.data+'T00:00:00'); return d.getFullYear()===y && d.getMonth()===m; };
+    const realizado = consultas.filter(c => inMonth(c) && c.statusSessao==='pagamento').reduce((s,c)=>s+c.valor,0);
+    const aberto    = consultas.filter(c => inMonth(c) && (c.statusSessao==='concluida' || c.statusSessao==='faltou')).reduce((s,c)=>s+c.valor,0);
+    const previsto  = consultas.filter(c => inMonth(c) && c.statusSessao==='agendada').reduce((s,c)=>s+c.valor,0);
+    const despesa   = despesas.filter(d => inMonth(d)).reduce((s,d)=>s+d.valor,0);
+    return { realizado, aberto, previsto, despesa, totalRev: realizado+aberto+previsto };
+  });
+  const maxVal = Math.max(...dados.map(d=>d.totalRev), ...dados.map(d=>d.despesa), 100);
+  const pL=56,pR=16,pT=12,pB=44,cW=W-pL-pR,cH=H-pT-pB;
+  const n=meses.length,gW=cW/n,bW=Math.min(26,gW*.33),gap=4;
+
+  ctx.strokeStyle='#e8e0d0';ctx.lineWidth=1;
+  ctx.fillStyle='#9e9890';ctx.font=`11px 'DM Sans',sans-serif`;ctx.textAlign='right';
+  for(let i=0;i<=4;i++){
+    const y=pT+cH*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(W-pR,y);ctx.stroke();
+    const v=maxVal*(i/4);
+    ctx.fillText(v>=1000?'R$'+(v/1000).toFixed(0)+'k':'R$'+Math.round(v),pL-6,y+4);
+  }
+
+  finChartHit = [];
+  meses.forEach((mo,i)=>{
+    const x=pL+i*gW+gW/2,xR=x-bW-gap/2,xD=x+gap/2;
+    const d=dados[i];
+    // Receita total (barra única verde)
+    const hR=Math.max(d.totalRev>0?2:0, d.totalRev/maxVal*cH);
+    ctx.fillStyle='#6b9470';const yR=pT+cH-hR,rR=Math.min(4,hR/2);
+    ctx.beginPath();if(ctx.roundRect)ctx.roundRect(xR,yR,bW,hR,[rR,rR,0,0]);else{ctx.rect(xR,yR,bW,hR);}ctx.fill();
+    // Despesa (barra vermelha)
+    const hD=Math.max(d.despesa>0?2:0, d.despesa/maxVal*cH);
+    ctx.fillStyle='#c47a7a';const yD=pT+cH-hD,rD=Math.min(4,hD/2);
+    ctx.beginPath();if(ctx.roundRect)ctx.roundRect(xD,yD,bW,hD,[rD,rD,0,0]);else{ctx.rect(xD,yD,bW,hD);}ctx.fill();
+    // rótulo do mês
+    ctx.fillStyle='#6b6560';ctx.font=`11px 'DM Sans',sans-serif`;ctx.textAlign='center';
+    ctx.fillText(mo.label,x,H-pB+16);
+    // área de hit para o tooltip (toda a coluna do mês)
+    finChartHit.push({ x0:pL+i*gW, x1:pL+(i+1)*gW, label:mo.full,
+      previsto:d.previsto, realizado:d.realizado, aberto:d.aberto, despesa:d.despesa, totalRev:d.totalRev });
+  });
+}
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+migrar();
+carregarPerfil();
+renderDashboard();
+renderDashHist();
+renderAgenda();
+</script>
+</body>
+</html>
