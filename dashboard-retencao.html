@@ -1,44 +1,882 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard de retenção | Leonardo Veras</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM · Dashboard de retenção — Junho 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#182737;font:16px/1.5 system-ui}main{max-width:1024px;padding:32px 20px 64px;margin:auto}h1,h2{line-height:1.2}h1{font-size:clamp(2rem,5vw,3.6rem);margin:.2em 0}header{background:#172d44;color:white;padding:24px;border-radius:16px}label,select{font:inherit}select{margin:0 0 0 8px;padding:5px 10px;border-radius:6px}section{background:white;padding:20px;margin-top:18px;border:1px solid #dbe4ee;border-radius:12px}.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.card{padding:12px;background:#eaf2f9;border-radius:8px}.card strong{display:block;font-size:1.65rem}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:9px;border-bottom:1px solid #dbe4ee}.scroll{overflow:auto}.flag{color:#813f06;font-weight:600}caption{text-align:left;margin-bottom:12px}
+  :root{
+    --bg:#0A0E1A;
+    --glass:rgba(255,255,255,.045);
+    --glass-2:rgba(255,255,255,.075);
+    --line:rgba(255,255,255,.09);
+    --line-soft:rgba(255,255,255,.06);
+    --ink:#EEF2FB; --muted:#94A3C8; --faint:#5C6B8C;
+    --violet:#8B5CF6; --cyan:#22D3EE; --green:#34D399; --rose:#FB7185; --amber:#FBBF24;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(55% 40% at 12% -5%, rgba(139,92,246,.16) 0%, transparent 60%),
+      radial-gradient(50% 45% at 95% 8%, rgba(34,211,238,.10) 0%, transparent 55%),
+      radial-gradient(60% 50% at 50% 110%, rgba(139,92,246,.08) 0%, transparent 60%),
+      var(--bg);
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:"Inter","Segoe UI",Arial,sans-serif;
+    line-height:1.55;
+    min-height:100vh;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+  /* ================= header ================= */
+  .hd{padding:30px 0 0}
+  .hd-row{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  .hd h1{font-size:22px;font-weight:700;letter-spacing:-.02em}
+  .hd h1 span{background:linear-gradient(90deg,var(--violet),var(--cyan));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hd .sub{font-size:13px;color:var(--muted);margin-top:3px}
+  .hd-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .msel{display:flex;gap:4px;background:var(--glass);border:1px solid var(--line);
+    border-radius:12px;padding:4px}
+  .mbtn{font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;
+    border:none;border-radius:8px;padding:6px 11px;cursor:pointer;transition:color .2s,background .2s}
+  .mbtn:hover{color:var(--ink)}
+  .mbtn.on{background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(34,211,238,.25));color:var(--ink)}
+  .tbtn{font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);background:var(--glass);
+    border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;transition:.2s}
+  .tbtn:hover{color:var(--ink);border-color:rgba(139,92,246,.55)}
+
+  /* ================= tabs ================= */
+  .tabs{position:sticky;top:0;z-index:30;margin-top:22px;
+    background:rgba(10,14,26,.82);backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--line-soft)}
+  .tabs .wrap{display:flex;gap:2px;overflow-x:auto}
+  .tab{font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);background:transparent;
+    border:none;padding:15px 18px 13px;cursor:pointer;position:relative;white-space:nowrap;transition:color .25s}
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--ink)}
+  .tab.on::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;
+    background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:2px}
+  .tab .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--rose);
+    margin-left:7px;vertical-align:2px}
+
+  /* ================= panels ================= */
+  .panel{display:none;padding:34px 0 70px}
+  .panel.show{display:block}
+  @keyframes fxIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .panel.show .fx{animation:fxIn .5s cubic-bezier(.2,.7,.3,1) both}
+  .p-head{margin-bottom:24px}
+  .p-title{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .p-desc{font-size:13px;color:var(--muted);margin-top:4px;max-width:720px}
+
+  .stack{display:flex;flex-direction:column;gap:16px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .split{display:grid;grid-template-columns:1.45fr 1fr;gap:16px;align-items:stretch}
+
+  /* ================= glass card ================= */
+  .card{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+    backdrop-filter:blur(14px);box-shadow:0 8px 32px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.05)}
+  .card h3{font-size:14px;font-weight:600}
+  .card .hint{font-size:12px;color:var(--muted);margin-top:2px;margin-bottom:14px}
+  .chart-box{position:relative;height:300px}
+  .chart-box.tall{height:340px}
+  .chart-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px}
+  .chart-foot .tip{font-size:11px;color:var(--faint)}
+  .zbtn{font-family:inherit;font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--line);
+    border-radius:8px;padding:3px 10px;cursor:pointer}
+  .zbtn:hover{color:var(--ink);border-color:rgba(34,211,238,.5)}
+
+  /* ================= sumário ================= */
+  .exec{display:flex;flex-direction:column;gap:0}
+  .exec .item{display:flex;gap:16px;padding:13px 2px;border-bottom:1px solid var(--line-soft);align-items:baseline}
+  .exec .item:last-child{border-bottom:none}
+  .exec .num{font-size:12px;font-weight:700;color:var(--cyan);min-width:22px}
+  .exec .txt{font-size:14.5px;line-height:1.55}
+  .exec .txt b{color:var(--ink);font-weight:700;border-bottom:2px solid rgba(139,92,246,.5)}
+
+  /* ================= KPIs ================= */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  .kpi{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:16px;
+    position:relative;cursor:pointer;transition:transform .2s,background .2s,border-color .2s;backdrop-filter:blur(14px)}
+  .kpi:hover{background:var(--glass-2);transform:translateY(-2px);border-color:rgba(139,92,246,.45)}
+  .kpi .lab{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .kpi .val{font-size:24px;font-weight:700;margin-top:8px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .kpi .delta{font-size:11.5px;margin-top:3px;font-weight:600}
+  .up{color:var(--green)} .down{color:var(--rose)} .flat{color:var(--muted)}
+  .kpi .stat{position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%}
+  .stat.red{background:var(--rose);box-shadow:0 0 10px rgba(251,113,133,.8)}
+  .stat.amber{background:var(--amber);box-shadow:0 0 10px rgba(251,191,36,.7)}
+  .stat.ok{background:rgba(148,163,200,.35)}
+
+  /* ================= alertas ================= */
+  .alerts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .alert-card{border-radius:14px;padding:16px 18px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(14px)}
+  .alert-card.red{border-color:rgba(251,113,133,.4);background:linear-gradient(135deg,rgba(251,113,133,.10),rgba(251,113,133,.03))}
+  .alert-card.amber{border-color:rgba(251,191,36,.38);background:linear-gradient(135deg,rgba(251,191,36,.09),rgba(251,191,36,.02))}
+  .alert-card.info{border-color:rgba(34,211,238,.35);background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(34,211,238,.02))}
+  .alert-card .top{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+  .pill{font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+  .pill.red{background:rgba(251,113,133,.2);color:#FDA4AF;border:1px solid rgba(251,113,133,.4)}
+  .pill.amber{background:rgba(251,191,36,.16);color:#FDE68A;border:1px solid rgba(251,191,36,.4)}
+  .pill.info{background:rgba(34,211,238,.14);color:#A5F3FC;border:1px solid rgba(34,211,238,.4)}
+  .alert-card .ttl{font-weight:600;font-size:14px}
+  .alert-card .body{font-size:12.5px;color:#C7D2E8}
+  .alert-card .lever{font-size:11.5px;color:var(--muted);margin-top:8px}
+  .alert-card .lever b{color:var(--ink);font-weight:600}
+
+  /* narrativa ao lado do gráfico */
+  .narr{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:22px;backdrop-filter:blur(14px);
+    display:flex;flex-direction:column;justify-content:center;gap:13px}
+  .narr .big{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;
+    background:linear-gradient(90deg,var(--rose),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .narr .big small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:8px;-webkit-text-fill-color:var(--muted)}
+  .narr p{font-size:13px;color:#C7D2E8}
+  .narr p b{color:var(--ink)}
+
+  /* levers */
+  .levers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .lever-card{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:20px;backdrop-filter:blur(14px);transition:.2s}
+  .lever-card:hover{background:var(--glass-2)}
+  .lever-card .n{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;
+    font-size:12px;font-weight:700;color:var(--ink);background:linear-gradient(135deg,rgba(139,92,246,.4),rgba(34,211,238,.3))}
+  .lever-card .h{font-size:14.5px;font-weight:600;margin:12px 0 7px}
+  .lever-card .d{font-size:12.5px;color:#C7D2E8}
+  .lever-card .meta{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft);font-size:11.5px;color:var(--muted)}
+  .lever-card .meta b{color:var(--cyan);font-weight:600}
+
+  .autonote{font-size:12.5px;color:var(--muted);background:var(--glass);border:1px dashed var(--line);
+    border-radius:12px;padding:12px 16px}
+
+  /* cohort table */
+  table.cohort{width:100%;border-collapse:separate;border-spacing:4px;font-size:13px}
+  table.cohort th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:center;padding:6px 4px}
+  table.cohort th:first-child,table.cohort td:first-child{text-align:left;padding-left:8px}
+  table.cohort td{text-align:center;padding:10px 6px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--line-soft);font-variant-numeric:tabular-nums}
+  table.cohort tr.rowc{cursor:pointer}
+  table.cohort tr.rowc:hover td{border-color:rgba(139,92,246,.5)}
+  td.coh-label{font-weight:600;background:transparent;border:none}
+  td.coh-label small{display:block;color:var(--faint);font-weight:400;font-size:10.5px}
+  td.hm{font-weight:600}
+  td.empty{color:var(--faint);background:transparent;border-style:dashed}
+
+  /* notas */
+  .notes p{font-size:13px;color:#C7D2E8;margin-bottom:12px;max-width:900px}
+  .notes b{color:var(--ink)}
+  table.rules{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+  table.rules th{color:var(--muted);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+  table.rules td{padding:9px 10px;border-bottom:1px solid var(--line-soft);color:#C7D2E8}
+
+  /* ================= modal ================= */
+  .modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+    background:rgba(6,9,18,.7);backdrop-filter:blur(6px);padding:20px}
+  .modal.open{display:flex}
+  @keyframes mIn{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+  .mbox{background:linear-gradient(160deg,rgba(30,36,60,.92),rgba(16,20,38,.94));
+    border:1px solid rgba(139,92,246,.4);border-radius:18px;max-width:620px;width:100%;max-height:86vh;
+    overflow:auto;padding:24px;position:relative;backdrop-filter:blur(20px);animation:mIn .3s ease both;
+    box-shadow:0 24px 80px rgba(0,0,0,.5)}
+  .mclose{position:absolute;top:14px;right:14px;background:var(--glass-2);border:1px solid var(--line);
+    color:var(--ink);width:31px;height:31px;border-radius:9px;cursor:pointer;font-size:14px;font-family:inherit}
+  .mclose:hover{border-color:var(--cyan);color:var(--cyan)}
+  .mtitle{font-size:16.5px;font-weight:700;margin-bottom:3px;padding-right:40px}
+  .msub{font-size:12px;color:var(--muted);margin-bottom:15px}
+  .mdef{font-size:12.5px;color:#C7D2E8;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);
+    border-radius:10px;padding:10px 14px;margin-bottom:14px}
+  .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .mrow{background:rgba(255,255,255,.04);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px}
+  .mrow .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .mrow .v{font-size:16px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+  .mrow .v small{font-size:11px;color:var(--muted);font-weight:400}
+  .mchart{height:190px;position:relative}
+
+  @media(max-width:960px){
+    .kpis{grid-template-columns:repeat(3,1fr)}
+    .grid-2,.split,.alerts,.levers,.mgrid{grid-template-columns:1fr}
+  }
+  @media(max-width:600px){.kpis{grid-template-columns:repeat(2,1fr)}.chart-box{height:260px}}
+  @media print{
+    .tabs,.hd-tools,.chart-foot,.mclose{display:none!important}
+    .panel{display:block!important;page-break-after:always;padding:20px 0}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .panel.show .fx{animation:none}
+    .mbox{animation:none}
+  }
 </style>
-<main>
-<header><small>ESTUDO DE CASO · LEONARDO VERAS</small><h1>Retenção e recorrência</h1><p>Demonstração com dados inteiramente sintéticos. Explore os indicadores mensais e compare o retorno das coortes.</p><label for="period">Mês de referência</label><select id="period"></select></header>
-<section aria-live="polite"><h2>Visão mensal</h2><div class="cards" id="cards"></div><p id="alert"></p></section>
-<section class="scroll"><h2>Retenção por coorte</h2><table><caption>Percentual da coorte de novos depositantes que voltou a depositar em cada mês subsequente.</caption><thead><tr><th scope="col">Coorte</th><th scope="col">M+1</th><th scope="col">M+2</th><th scope="col">M+3</th></tr></thead><tbody id="cohorts"></tbody></table></section>
-<section><h2>Como usar na operação</h2><p>Compare o churn com o mês anterior e use as coortes para entender quando a retenção cai. Investigue públicos como novos depositantes que ainda não voltaram, usuários ativos sem depósito no mês e usuários que deixaram de estar ativos.</p><p>Nesta demonstração, a recorrência é a proporção dos depositantes do mês que depositaram pelo menos duas vezes naquele mês. O churn é a proporção da base ativa do mês anterior que ficou inativa no mês selecionado.</p></section>
-</main>
+</head>
+<body>
+
+<header class="hd"><div class="wrap hd-row">
+  <div>
+    <h1>CRM · Dashboard de retenção — <span id="hdMonth">Junho 2026</span></h1>
+    <div class="sub" id="hdSub">Retenção &amp; base ativa · série dez/25 → jun/26 · dados fictícios</div>
+  </div>
+  <div class="hd-tools">
+    <div class="msel" id="monthSel"></div>
+    <button class="tbtn" id="btnExport" title="Imprime todas as abas em PDF">Exportar PDF</button>
+  </div>
+</div></header>
+
+<nav class="tabs"><div class="wrap">
+  <button class="tab on" data-t="geral">Visão Geral<span class="dot" id="dotAlert"></span></button>
+  <button class="tab" data-t="retencao">Retenção</button>
+  <button class="tab" data-t="recorr">Recorrência</button>
+  <button class="tab" data-t="segmentos">Segmentos</button>
+  <button class="tab" data-t="notas">Notas</button>
+</div></nav>
+
+<!-- ============ VISÃO GERAL ============ -->
+<div class="panel show" id="p-geral"><div class="wrap stack">
+  <div class="p-head fx">
+    <div class="p-title">Visão geral do mês</div>
+    <div class="p-desc" id="geralDesc">Sumário executivo, scorecard e alertas — a leitura que o board precisa em uma tela.</div>
+  </div>
+
+  <div class="card fx">
+    <h3>Sumário executivo</h3>
+    <div class="hint">Se ler uma coisa só, leia isto.</div>
+    <div class="exec" id="execList"></div>
+  </div>
+
+  <div class="kpis fx" id="kpiStrip"></div>
+
+  <div class="fx">
+    <div class="card" style="padding-bottom:8px">
+      <h3>Urgências &amp; alertas</h3>
+      <div class="hint" id="alertNote"></div>
+    </div>
+    <div class="alerts" style="margin-top:12px" id="alertGrid"></div>
+  </div>
+
+  <div class="split fx">
+    <div class="card">
+      <h3>Saúde da base</h3>
+      <div class="hint">Entradas (FTDs + reativados) vs. saídas (churn absoluto), MAU na linha. Clique numa barra para o raio-x do mês.</div>
+      <div class="chart-box tall"><canvas id="chFlow"></canvas></div>
+      <div class="chart-foot"><span class="tip">arraste para dar zoom · clique = detalhe do mês</span>
+        <button class="zbtn" data-z="chFlow">redefinir zoom</button></div>
+    </div>
+    <div class="narr" id="baseNarr"></div>
+  </div>
+
+  <div class="fx">
+    <div class="card" style="padding-bottom:8px">
+      <h3>Direcionamento estratégico</h3>
+      <div class="hint" id="leverNote"></div>
+    </div>
+    <div class="levers" style="margin-top:12px" id="leverGrid"></div>
+  </div>
+</div></div>
+
+<!-- ============ RETENÇÃO ============ -->
+<div class="panel" id="p-retencao"><div class="wrap stack">
+  <div class="p-head fx">
+    <div class="p-title">Retenção por safra</div>
+    <div class="p-desc">De cada 100 novos depositantes, quantos seguem ativos após 30/60/90 dias. A queda forte é D0→D30; depois a curva achata.</div>
+  </div>
+  <div class="fx">
+    <div class="card">
+      <h3>Mapa de calor das safras</h3>
+      <div class="hint">Mais intenso = mais retenção · tracejado = cohort não maturado (não é zero) · clique numa linha para o raio-x.</div>
+      <table class="cohort" id="cohortTable"></table>
+    </div>
+  </div>
+  <div class="card fx">
+    <h3>Leitura</h3>
+    <div class="hint">O que as safras estão dizendo.</div>
+    <div class="exec">
+      <div class="item"><span class="num">·</span><span class="txt">As coortes de dezembro a abril ficaram entre <b>36% e 38%</b> em D30.</span></div>
+      <div class="item"><span class="num">·</span><span class="txt">A coorte de maio ficou perto de <b>31%</b>, o que dispara um alerta de retenção.</span></div>
+      <div class="item"><span class="num">·</span><span class="txt">O D30 de junho ainda não está disponível nesta série.</span></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============ RECORRÊNCIA ============ -->
+<div class="panel" id="p-recorr"><div class="wrap stack">
+  <div class="p-head fx">
+    <div class="p-title">Escada de recorrência</div>
+    <div class="p-desc">% dos depositantes do mês que chegaram ao 2º/3º/4º depósito. O 2º depósito é o indicador mais direto de hábito formado.</div>
+  </div>
+  <div class="grid-2 fx">
+    <div class="card">
+      <h3>Evolução das taxas</h3>
+      <div class="hint">Junho é o piso da série nos três degraus. Clique num ponto para os números absolutos do mês.</div>
+      <div class="chart-box"><canvas id="chRec"></canvas></div>
+      <div class="chart-foot"><span class="tip">arraste para dar zoom · clique = detalhe</span>
+        <button class="zbtn" data-z="chRec">redefinir zoom</button></div>
+    </div>
+    <div class="card">
+      <h3>Funil do mês selecionado — <span id="funilMes"></span></h3>
+      <div class="hint" id="funilHint"></div>
+      <div class="chart-box"><canvas id="chFunnel"></canvas></div>
+    </div>
+  </div>
+  <div class="card fx">
+    <h3>Leitura</h3>
+    <div class="hint">Onde a escada perde gente.</div>
+    <div class="exec" id="recRead"></div>
+  </div>
+</div></div>
+
+<!-- ============ SEGMENTOS ============ -->
+<div class="panel" id="p-segmentos"><div class="wrap stack">
+  <div class="p-head fx">
+    <div class="p-title">Segmentos &amp; valor</div>
+    <div class="p-desc">Composição do MAU (quem deposita vs. quem só joga) e valor médio movimentado por jogador ativo.</div>
+  </div>
+  <div class="grid-2 fx">
+    <div class="card">
+      <h3>Composição do MAU</h3>
+      <div class="hint">Ativos sem depósito são público endereçável, não churn. Clique numa barra para o raio-x do mês.</div>
+      <div class="chart-box"><canvas id="chMix"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Turnover por jogador ativo</h3>
+      <div class="hint">Ler com cuidado: muita safra nova de baixo valor derruba a média sem que nada tenha piorado.</div>
+      <div class="chart-box"><canvas id="chTurn"></canvas></div>
+    </div>
+  </div>
+  <div class="card fx">
+    <h3>Leitura</h3>
+    <div class="hint">Os públicos que importam agora.</div>
+    <div class="exec">
+      <div class="item"><span class="num">·</span><span class="txt">Em junho, <b>5.020 ativos</b> não depositaram, cerca de 48% da base.</span></div>
+      <div class="item"><span class="num">·</span><span class="txt">O turnover por ativo ficou em <b>R$ 222,20</b> em junho, ante R$ 253,60 em maio.</span></div>
+      <div class="item"><span class="num">·</span><span class="txt">As reativações passaram de <b>630 para 510</b>.</span></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============ NOTAS ============ -->
+<div class="panel" id="p-notas"><div class="wrap stack">
+  <div class="p-head fx">
+    <div class="p-title">Notas metodológicas</div>
+    <div class="p-desc">Definições, verificações de qualidade e as regras objetivas que disparam os alertas.</div>
+  </div>
+  <div class="card fx notes">
+    <h3>Definições</h3>
+    <div class="hint">As definições a seguir explicam os indicadores da demonstração.</div>
+    <p><b>Churn Rate (base existente)</b> = 1 − ((MAU − Novos FTDs − Reativados) ÷ MAU anterior). Estima a proporção da base do mês anterior que deixou de estar ativa.</p>
+    <p><b>Retenção D30/D60/D90</b> — % da safra de FTDs ativa após 30/60/90 dias. Células em branco nos meses recentes são cohorts <b>ainda não maturados</b>, não churn.</p>
+    <p><b>Taxa de Recorrência</b> = recorrentes ÷ Total de Depositantes do mês. O denominador inclui FTDs novos — meses de aquisição alta diluem a taxa (efeito de mix).</p>
+  </div>
+  <div class="card fx notes">
+    <h3>Verificações de qualidade — jun/26</h3>
+    <div class="hint">Rodadas antes de qualquer conclusão.</div>
+    <p>✓ Série consistente com o fluxo da base ativa.<br>
+    ✓ Taxas de segundo, terceiro e quarto depósito com o mesmo denominador.<br>
+    ✓ Coortes recentes exibidas com períodos ainda sem observação.</p>
+  </div>
+  <div class="card fx notes">
+    <h3>Regras de alerta</h3>
+    <div class="hint">Aplicadas mecanicamente todo mês — inclusive ao trocar o mês no seletor.</div>
+    <table class="rules">
+      <tr><th>Regra</th><th>Nível</th></tr>
+      <tr><td>MAU cai vs. mês anterior</td><td>🔴 Vermelho</td></tr>
+      <tr><td>Churn Rate sobe &gt; 10 p.p. MoM</td><td>🔴 Vermelho</td></tr>
+      <tr><td>Churn Rate sobe &gt; 5 p.p. MoM</td><td>🟡 Âmbar</td></tr>
+      <tr><td>D30 da safra recém-madura &gt; 3 p.p. abaixo da média das 3 anteriores</td><td>🔴 Vermelho</td></tr>
+      <tr><td>Taxa de 2º depósito cai MoM</td><td>🟡 Âmbar</td></tr>
+      <tr><td>Turnover cai &gt; 10% sem aumento proporcional de FTDs</td><td>🟡 Âmbar</td></tr>
+      <tr><td>"MAU sem depósito" cresce como % do MAU</td><td>🔵 Informativo (oportunidade)</td></tr>
+    </table>
+    <p style="margin-top:14px">Os números e as estimativas desta página são fictícios.</p>
+  </div>
+</div></div>
+
+<!-- modal drill-down -->
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="mbox">
+    <button class="mclose" id="mclose" aria-label="Fechar">✕</button>
+    <div class="mtitle" id="mtitle"></div>
+    <div class="msub" id="msub"></div>
+    <div class="mdef" id="mdef" style="display:none"></div>
+    <div class="mgrid" id="mgrid"></div>
+    <div class="mchart"><canvas id="mcanvas"></canvas></div>
+  </div>
+</div>
+
 <script>
-const months = [
-  {name:'Janeiro', active:1260, churn:18, repeat:44, cohort:[39,27,21]},
-  {name:'Fevereiro', active:1315, churn:17, repeat:46, cohort:[41,29,22]},
-  {name:'Março', active:1370, churn:19, repeat:43, cohort:[36,25,19]},
-  {name:'Abril', active:1330, churn:23, repeat:39, cohort:[34,22]},
-  {name:'Maio', active:1405, churn:20, repeat:42, cohort:[38]},
-  {name:'Junho', active:1450, churn:18, repeat:45, cohort:[]}
-];
-const select = document.getElementById('period');
-const cards = document.getElementById('cards');
-const alert = document.getElementById('alert');
-const cohorts = document.getElementById('cohorts');
-months.forEach((month,index) => select.add(new Option(month.name,index)));
-function render(){
-  const index = Number(select.value);
-  const month = months[index];
-  const previous = months[index-1];
-  const indicators = [['Base ativa',month.active.toLocaleString('pt-BR')],['Churn',month.churn+'%'],['Recorrência de depósitos',month.repeat+'%']];
-  cards.innerHTML = indicators.map(([label,value]) => '<div class="card">'+label+'<strong>'+value+'</strong></div>').join('');
-  const change = previous ? month.churn - previous.churn : 0;
-  alert.classList.toggle('flag',change >= 3);
-  alert.textContent = change >= 3 ? 'Alerta ilustrativo: churn subiu '+change+' pontos percentuais em relação ao mês anterior.' : previous ? 'Sem alerta de alta de churn (limite ilustrativo de 3 pontos percentuais).' : 'Primeiro mês da série, sem comparação mensal.';
-  cohorts.innerHTML = months.slice(0,index+1).map((row,rowIndex) => '<tr><th scope="row">'+row.name+'</th>'+[1,2,3].map(offset => '<td>'+(rowIndex+offset <= index && row.cohort[offset-1] !== undefined ? row.cohort[offset-1]+'%' : '—')+'</td>').join('')+'</tr>').join('');
+/* Série fictícia criada para reproduzir as interações do dashboard. */
+const months = ["dez/25","jan/26","fev/26","mar/26","abr/26","mai/26","jun/26"];
+const mau = [8200,8950,9380,9700,10350,10850,10500];
+const ftds = [1650,1850,1980,2075,2230,2380,2610];
+const reativados = [420,480,500,560,600,630,510];
+const depositantes = [4100,4450,4910,5100,5520,5730,5480];
+const mauPrev0 = 7600;
+const churnAbs = mau.map((value,i)=>(mau[i-1] ?? mauPrev0) + ftds[i] + reativados[i] - value);
+const churnRate = churnAbs.map((value,i)=>100 * value / (mau[i-1] ?? mauPrev0));
+const quantidades = series => series.map((taxa,i)=>Math.round(depositantes[i]*taxa/100));
+const d2abs = quantidades([64,66,65,67,66,68,63]);
+const d3abs = quantidades([48,50,49,51,50,52,46]);
+const d4abs = quantidades([36,37,36,38,39,40,34]);
+const taxa = series => series.map((n,i)=>100*n/depositantes[i]);
+const cohortSamples = [[37,29,22],[36,28,22],[38,30,23],[37,28,21],[36,27],[31],[]];
+const cohorts = months.map((m,i)=>{
+  const d0 = ftds[i];
+  const [a30,a60,a90] = [0,1,2].map(day=>{
+    const rate = cohortSamples[i][day];
+    return rate == null ? null : Math.round(d0*rate/100);
+  });
+  const percent = value => value == null ? null : 100*value/d0;
+  return {m,d0,a30,a60,a90,d30:percent(a30),d60:percent(a60),d90:percent(a90)};
+});
+const DATA = {
+  months,mauPrev0,mau,ftds,reativados,churnAbs,churnRate,depositantes,d2abs,d3abs,d4abs,cohorts,
+  turnover:[216.5,226.8,232.4,241.5,248.2,253.6,222.2],
+  semDeposito:mau.map((value,i)=>value-depositantes[i]),
+  taxa2:taxa(d2abs),taxa3:taxa(d3abs),taxa4:taxa(d4abs)
+};
+
+const NARRATIVA = {
+  mes:"jun/26",
+  sumario:[
+    "Em junho, os novos depósitos cresceram, mas a base ativa caiu de <b>10.850</b> para <b>10.500</b>.",
+    "A alta do churn e a redução da reativação ajudam a explicar a queda da base.",
+    "A coorte de maio reteve aproximadamente <b>31%</b> em D30, abaixo das três anteriores.",
+    "A participação de ativos sem depósito aumentou. Esse público pode entrar na análise de priorização de CRM.",
+  ],
+  direcionamento:[
+    {n:"1",h:"Retenção precoce",d:"Acompanhar a primeira janela de atividade das coortes recentes.",metrica:"Retenção D30",impacto:"cada +1 p.p. em junho representa cerca de 26 pessoas"},
+    {n:"2",h:"Churn da base",d:"Investigar a alta de saída da base existente e comparar segmentos da série.",metrica:"Churn da base existente",impacto:"cada −1 p.p. equivale a cerca de 109 pessoas da base do mês anterior"},
+    {n:"3",h:"Segundo depósito",d:"Acompanhar a passagem do primeiro para o segundo depósito após a queda na recorrência.",metrica:"Taxa de 2º depósito",impacto:"cada +1 p.p. representa cerca de 55 depositantes no mês"},
+  ],
+  baseNarr:{
+    big:"−350", small:"Variação da base ativa em junho",
+    p1:"O mês teve <b>2.610 novos depositantes</b> e <b>510 reativados</b>. A saída estimada de 3.470 superou essas entradas.",
+    p2:"A análise combina o saldo da base e a retenção das coortes para orientar a investigação."
+  }
+};
+
+/* =====================================================================
+   ESTADO · FORMATAÇÃO · REGRAS
+   ===================================================================== */
+const D=DATA, M=D.months, LAST=M.length-1;
+const state={sel:LAST, charts:{}, modalChart:null, tab:'geral'};
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const nf=new Intl.NumberFormat('pt-BR');
+const f1=v=>v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const fR=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+const fmtK=v=>Math.abs(v)>=1000?(v/1000).toLocaleString('pt-BR',{maximumFractionDigits:0})+' mil':nf.format(v);
+const pp=v=>(v>0?'+':'−')+f1(Math.abs(v))+' p.p.';
+const sl=a=>a.slice(0,state.sel+1);
+const mauPrev=i=>i===0?D.mauPrev0:D.mau[i-1];
+const MESES={0:"Dezembro 2025",1:"Janeiro 2026",2:"Fevereiro 2026",3:"Março 2026",4:"Abril 2026",5:"Maio 2026",6:"Junho 2026"};
+
+function alertsFor(i){
+  const out=[];
+  const mauD=D.mau[i]-mauPrev(i);
+  if(mauD<0) out.push({nivel:"red",titulo:"MAU caiu vs. mês anterior",
+    body:`${nf.format(mauPrev(i))} → ${nf.format(D.mau[i])} (${nf.format(mauD)}). A base encolheu: as entradas não repuseram a saída.`,
+    lever:"Alavanca: <b>contenção de churn da base existente</b>."});
+  if(i>0){
+    const cd=D.churnRate[i]-D.churnRate[i-1];
+    if(cd>10) out.push({nivel:"red",titulo:`Churn Rate ${f1(D.churnRate[i])}% (${pp(cd)} MoM)`,
+      body:"Salto acima de 10 p.p. — vazamento acelerado da base existente.",lever:"Alavanca: <b>retenção da base existente</b>."});
+    else if(cd>5) out.push({nivel:"amber",titulo:`Churn Rate ${f1(D.churnRate[i])}% (${pp(cd)} MoM)`,
+      body:"Alta acima de 5 p.p. — atenção ao vazamento da base existente.",lever:"Alavanca: <b>retenção da base existente</b>."});
+  }
+  const j=i-1;
+  if(j>=3 && D.cohorts[j].d30!=null){
+    const p3=[D.cohorts[j-3].d30,D.cohorts[j-2].d30,D.cohorts[j-1].d30];
+    if(p3.every(v=>v!=null)){
+      const avg=p3.reduce((a,b)=>a+b)/3, diff=D.cohorts[j].d30-avg;
+      if(diff<-3) out.push({nivel:"red",titulo:`Safra ${D.cohorts[j].m} reteve mal (D30 ${f1(D.cohorts[j].d30)}%)`,
+        body:`${pp(diff)} vs. média das 3 safras anteriores (${f1(avg)}%) — limiar de 3 p.p. rompido.`,
+        lever:"Alavanca: <b>retenção precoce (D0–D14) da safra</b>."});
+    }
+  }
+  if(i>0 && D.taxa2[i]<D.taxa2[i-1]) out.push({nivel:"amber",
+    titulo:`Taxa de 2º depósito caiu para ${f1(D.taxa2[i])}%`,
+    body:`${pp(D.taxa2[i]-D.taxa2[i-1])} MoM. O degrau 1º→2º é o maior da escada de recorrência.`,
+    lever:"Alavanca: <b>conversão ao 2º depósito na janela pós-FTD</b>."});
+  if(i>0){
+    const td=(D.turnover[i]/D.turnover[i-1]-1)*100, fg=(D.ftds[i]/D.ftds[i-1]-1)*100;
+    if(td<-10 && fg<Math.abs(td)) out.push({nivel:"amber",titulo:`Turnover caiu ${f1(Math.abs(td))}%`,
+      body:"Queda acima de 10% sem aumento proporcional de FTDs — pode ser perda de valor, não só mix.",
+      lever:"Alavanca: <b>valor por jogador ativo</b>."});
+    if(D.semDeposito[i]/D.mau[i]>D.semDeposito[i-1]/D.mau[i-1]) out.push({nivel:"info",
+      titulo:`"MAU sem depósito" subiu para ${f1(D.semDeposito[i]/D.mau[i]*100)}% do MAU`,
+      body:`${nf.format(D.semDeposito[i])} jogadores ativos sem depositar — público endereçável crescendo.`,
+      lever:"Oportunidade: <b>conversão do ativo sem depósito</b>."});
+  }
+  if(!out.length) out.push({nivel:"info",titulo:"Nenhum limiar rompido",
+    body:"Nenhuma regra objetiva de alerta disparou neste mês.",lever:"Manter monitoramento."});
+  return out;
 }
-select.value = '5';
-select.addEventListener('change',render);
-render();
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function statusKPIs(i){
+  const mauD=D.mau[i]-mauPrev(i);
+  const cd=i>0?D.churnRate[i]-D.churnRate[i-1]:null;
+  const j=i-1, coh=j>=0?D.cohorts[j]:null;
+  let d30Val="—",d30Delta="safra não maturada",d30Alert=false;
+  const d30Lab=`D30 · safra ${j>=0?D.cohorts[j].m.split('/')[0]:'—'}`;
+  if(coh && coh.d30!=null){
+    d30Val=f1(coh.d30)+"%";
+    if(j>=3 && [j-1,j-2,j-3].every(k=>D.cohorts[k].d30!=null)){
+      const avg=(D.cohorts[j-1].d30+D.cohorts[j-2].d30+D.cohorts[j-3].d30)/3, diff=coh.d30-avg;
+      d30Delta=`${pp(diff)} vs. média 3 safras`; d30Alert=diff<-3;
+    } else d30Delta="média de comparação indisponível";
+  }
+  const t2d=i>0?D.taxa2[i]-D.taxa2[i-1]:null;
+  const tvd=i>0?(D.turnover[i]/D.turnover[i-1]-1)*100:null;
+  const fgd=i>0?(D.ftds[i]/D.ftds[i-1]-1)*100:null;
+  return [
+    {lab:"MAU",txt:nf.format(D.mau[i]),delta:(mauD>=0?"+":"")+nf.format(mauD)+" MoM",cls:mauD<0?"down":"up",st:mauD<0?'red':'ok'},
+    {lab:"Novos FTDs",txt:nf.format(D.ftds[i]),delta:fgd!=null?((fgd>=0?"+":"")+f1(fgd)+"% MoM"):"início da série",cls:fgd!=null&&fgd<0?"down":"up",st:'ok'},
+    {lab:"Churn Rate",txt:f1(D.churnRate[i])+"%",delta:cd!=null?pp(cd)+" MoM":"—",cls:cd>0?"down":"up",st:cd!=null&&cd>10?'red':cd!=null&&cd>5?'amber':'ok'},
+    {lab:d30Lab,txt:d30Val,delta:d30Delta,cls:d30Alert?"down":"flat",st:d30Alert?'red':'ok'},
+    {lab:"Taxa 2º dep",txt:f1(D.taxa2[i])+"%",delta:t2d!=null?pp(t2d)+" MoM":"—",cls:t2d<0?"down":"up",st:t2d!=null&&t2d<0?'amber':'ok'},
+    {lab:"Turnover/ativo",txt:fR(D.turnover[i]),delta:tvd!=null?((tvd>=0?"+":"")+f1(tvd)+"% MoM"):"—",cls:"flat",st:'ok'},
+  ];
+}
+
+function renderKPIs(i){
+  document.getElementById('kpiStrip').innerHTML=statusKPIs(i).map((k,idx)=>`
+    <div class="kpi" data-k="${idx}" title="Clique para ver a série completa">
+      <span class="stat ${k.st}"></span>
+      <div class="lab">${k.lab}</div>
+      <div class="val">${k.txt}</div>
+      <div class="delta ${k.cls}">${k.delta}</div>
+    </div>`).join('');
+}
+
+function renderAlerts(i){
+  const list=alertsFor(i);
+  document.getElementById('alertNote').textContent=(i===LAST)
+    ?"Gerados pelas regras de alerta para os dados fictícios."
+    :`Gerados automaticamente pelas regras do projeto para ${M[i]}.`;
+  document.getElementById('alertGrid').innerHTML=list.map(a=>`
+    <div class="alert-card ${a.nivel}">
+      <div class="top"><span class="pill ${a.nivel}">${a.nivel==='red'?'Vermelho':a.nivel==='amber'?'Âmbar':'Informativo'}</span>
+      <span class="ttl">${a.titulo}</span></div>
+      <div class="body">${a.body}</div>
+      <div class="lever">${a.lever}</div>
+    </div>`).join('');
+  document.getElementById('dotAlert').style.display=list.some(a=>a.nivel==='red')?'inline-block':'none';
+}
+
+function renderSummary(i){
+  const el=document.getElementById('execList');
+  if(i===LAST){
+    el.innerHTML=NARRATIVA.sumario.map((s,ix)=>`<div class="item"><span class="num">${ix+1}</span><span class="txt">${s}</span></div>`).join('');
+  }else{
+    const mauD=D.mau[i]-mauPrev(i);
+    el.innerHTML=`<div class="item"><span class="num">1</span><span class="txt">Em ${M[i]}, o MAU ${mauD>=0?'cresceu':'caiu'} <b>${nf.format(Math.abs(mauD))}</b> (${nf.format(mauPrev(i))} → ${nf.format(D.mau[i])}), com <b>${fmtK(D.ftds[i])} FTDs</b> novos e churn de <b>${f1(D.churnRate[i])}%</b>.</span></div>
+      <div class="item"><span class="num">·</span><span class="txt" style="color:var(--muted)">Resumo automático — a narrativa editorial completa é do mês de fechamento (${NARRATIVA.mes}).</span></div>`;
+  }
+}
+
+function renderLevers(i){
+  const grid=document.getElementById('leverGrid');
+  if(i===LAST){
+    document.getElementById('leverNote').textContent="Alavancas prioritárias — o quê e por quê; a campanha é decisão do time de CRM.";
+    grid.innerHTML=NARRATIVA.direcionamento.map(v=>`
+      <div class="lever-card"><span class="n">${v.n}</span><div class="h">${v.h}</div>
+        <div class="d">${v.d}</div>
+        <div class="meta">Métrica-alvo: <b>${v.metrica}</b><br>Impacto (conservador): ${v.impacto}</div>
+      </div>`).join('');
+  }else{
+    document.getElementById('leverNote').textContent=`Direcionamento editorial disponível apenas para ${NARRATIVA.mes}.`;
+    grid.innerHTML=`<div class="autonote" style="grid-column:1/-1">Selecione ${NARRATIVA.mes} no seletor para ver as alavancas prioritárias do relatório.</div>`;
+  }
+}
+
+function renderBaseNarr(i){
+  const el=document.getElementById('baseNarr');
+  if(i===LAST){
+    const n=NARRATIVA.baseNarr;
+    el.innerHTML=`<div class="big">${n.big}<small>${n.small}</small></div><p>${n.p1}</p><p>${n.p2}</p>`;
+  }else{
+    const mauD=D.mau[i]-mauPrev(i);
+    el.innerHTML=`<div class="big">${(mauD>=0?'+':'−')+nf.format(Math.abs(mauD))}<small>Variação de MAU em ${M[i]}</small></div>
+      <p>Entradas: <b>${fmtK(D.ftds[i])} FTDs</b> + <b>${fmtK(D.reativados[i])} reativados</b>. Churn absoluto: <b>${fmtK(D.churnAbs[i])}</b>. Churn da base existente: <b>${f1(D.churnRate[i])}%</b>.</p>
+      <p style="color:var(--muted)">Leitura automática — narrativa editorial em ${NARRATIVA.mes}.</p>`;
+  }
+}
+
+function renderRecRead(i){
+  const perda12=D.depositantes[i]-D.d2abs[i];
+  document.getElementById('recRead').innerHTML=`
+    <div class="item"><span class="num">·</span><span class="txt">O maior degrau é <b>1º→2º depósito</b>: em ${M[i]}, ${nf.format(perda12)} depositantes (${f1(100-D.taxa2[i])}%) pararam no primeiro.</span></div>
+    <div class="item"><span class="num">·</span><span class="txt">Cada <b>+1 p.p.</b> na taxa de 2º depósito ≈ <b>${fmtK(Math.round(D.depositantes[i]*0.01))} recorrentes</b> a mais no mês.</span></div>
+    <div class="item"><span class="num">·</span><span class="txt">A taxa é sensível a mix: FTDs novos são <b>${f1(D.ftds[i]/D.depositantes[i]*100)}%</b> dos depositantes de ${M[i]} — safra nova deposita menos vezes dentro do próprio mês.</span></div>`;
+  document.getElementById('funilMes').textContent=M[i];
+  document.getElementById('funilHint').textContent=`Escada em jogadores absolutos. Troque o mês no seletor acima para comparar.`;
+}
+
+function renderHeader(i){
+  document.getElementById('hdMonth').textContent=MESES[i];
+  document.getElementById('hdSub').textContent=`Retenção & base ativa · série dez/25 → ${M[i]} · dados fictícios`+(i!==LAST?' · visão retroativa':'');
+}
+
+function renderStatic(){
+  const hm=v=>{if(v==null)return`<td class="empty">—</td>`;
+    const a=Math.max(.10,Math.min(.9,v/34));
+    return`<td class="hm" style="background:rgba(139,92,246,${(a*.55).toFixed(2)});border-color:rgba(139,92,246,${(a*.8).toFixed(2)});color:#E4DBFF">${f1(v)}%</td>`;};
+  document.getElementById('cohortTable').innerHTML=
+    `<tr><th>Safra</th><th>FTDs D0</th><th>D30</th><th>D60</th><th>D90</th></tr>`+
+    D.cohorts.map((c,ix)=>`<tr class="rowc" data-c="${ix}"><td class="coh-label">${c.m}${c.tag?`<small>${c.tag}</small>`:''}</td>
+      <td>${nf.format(c.d0)}</td>${hm(c.d30)}${hm(c.d60)}${hm(c.d90)}</tr>`).join('');
+}
+
+function renderAll(){
+  renderHeader(state.sel); renderSummary(state.sel); renderKPIs(state.sel);
+  renderAlerts(state.sel); renderBaseNarr(state.sel); renderLevers(state.sel); renderRecRead(state.sel);
+}
+
+/* =====================================================================
+   GRÁFICOS
+   ===================================================================== */
+if(window.ChartZoom) Chart.register(window.ChartZoom);
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const C={v:css('--violet'),c:css('--cyan'),g:css('--green'),r:css('--rose'),a:css('--amber'),mut:css('--muted')};
+Chart.defaults.color=C.mut;Chart.defaults.borderColor='rgba(255,255,255,.06)';
+Chart.defaults.font.family='"Inter","Segoe UI",Arial,sans-serif';
+Chart.defaults.font.size=11.5;
+Chart.defaults.plugins.legend.labels.boxWidth=10;Chart.defaults.plugins.legend.labels.boxHeight=10;
+Chart.defaults.plugins.legend.labels.padding=16;
+Chart.defaults.plugins.tooltip.backgroundColor='rgba(22,27,48,.96)';
+Chart.defaults.plugins.tooltip.borderColor='rgba(139,92,246,.5)';
+Chart.defaults.plugins.tooltip.borderWidth=1;Chart.defaults.plugins.tooltip.titleColor='#fff';
+Chart.defaults.plugins.tooltip.padding=12;Chart.defaults.plugins.tooltip.cornerRadius=10;
+if(RM) Chart.defaults.animation=false;
+
+const zoomOpts={zoom:{drag:{enabled:true,backgroundColor:'rgba(139,92,246,.18)'},wheel:{enabled:true,modifierKey:'ctrl'},mode:'x'}};
+function grad(ctx,c1,c2){const g=ctx.createLinearGradient(0,0,0,300);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;}
+
+const factories={
+  chFlow(cv){
+    const s=state.sel, n=state.sel+1;
+    const bw=Array.from({length:n},(_,x)=>x===s?1.5:0);
+    return new Chart(cv,{data:{labels:sl(M),datasets:[
+      {type:'bar',label:'Novos FTDs',data:sl(D.ftds),backgroundColor:'rgba(52,211,153,.75)',stack:'in',borderRadius:5,borderWidth:bw,borderColor:'#fff'},
+      {type:'bar',label:'Reativados',data:sl(D.reativados),backgroundColor:'rgba(34,211,238,.7)',stack:'in',borderRadius:5,borderWidth:bw,borderColor:'#fff'},
+      {type:'bar',label:'Churn Absoluto (saíram)',data:sl(D.churnAbs).map(v=>-v),backgroundColor:'rgba(251,113,133,.72)',stack:'in',borderRadius:5,borderWidth:bw,borderColor:'#fff'},
+      {type:'line',label:'MAU',data:sl(D.mau),yAxisID:'y2',borderColor:C.v,borderWidth:2.5,tension:.35,
+        pointRadius:Array.from({length:n},(_,x)=>x===s?6:4),pointBackgroundColor:'#fff',pointBorderColor:C.v,pointBorderWidth:2}]},
+      options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        onClick:(e,el,ch)=>{const p=ch.getElementsAtEventForMode(e,'index',{intersect:false},true);if(p.length)openMonth(p[0].index);},
+        scales:{y:{ticks:{callback:v=>fmtK(Math.abs(v))}},
+          y2:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>fmtK(v)}},x:{grid:{display:false}}},
+        plugins:{legend:{position:'bottom'},...(window.ChartZoom?zoomOpts:{}),
+          tooltip:{callbacks:{
+            label:c=>`${c.dataset.label}: ${nf.format(Math.abs(c.raw))}`,
+            footer:items=>{const i=items[0].dataIndex;const net=D.ftds[i]+D.reativados[i]-D.churnAbs[i];
+              return `Fluxo líquido (contagem própria): ${net>=0?'+':''}${nf.format(net)}\nΔ MAU: ${(D.mau[i]-mauPrev(i)>=0?'+':'')+nf.format(D.mau[i]-mauPrev(i))}`;}
+          }}}}});
+  },
+  chRec(cv){
+    const s=state.sel,n=s+1;
+    const pr=Array.from({length:n},(_,x)=>x===s?6:3.5);
+    return new Chart(cv,{type:'line',
+      data:{labels:sl(M),datasets:[
+        {label:'2º depósito+',data:sl(D.taxa2),borderColor:C.v,backgroundColor:C.v,borderWidth:2.5,tension:.35,pointRadius:pr,pointBackgroundColor:'#fff',pointBorderColor:C.v,pointBorderWidth:2},
+        {label:'3º depósito+',data:sl(D.taxa3),borderColor:C.c,backgroundColor:C.c,borderWidth:2,tension:.35,pointRadius:pr},
+        {label:'4º depósito+',data:sl(D.taxa4),borderColor:C.g,backgroundColor:C.g,borderWidth:2,tension:.35,pointRadius:pr}]},
+      options:{maintainAspectRatio:false,
+        onClick:(e,el,ch)=>{const p=ch.getElementsAtEventForMode(e,'index',{intersect:false},true);if(p.length)openRec(p[0].index);},
+        scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}},
+        plugins:{legend:{position:'bottom'},...(window.ChartZoom?zoomOpts:{}),
+          tooltip:{callbacks:{label:c=>{
+            const i=c.dataIndex,abs={0:D.d2abs,1:D.d3abs,2:D.d4abs}[c.datasetIndex][i];
+            return `${c.dataset.label}: ${f1(c.raw)}% (${nf.format(abs)} jogadores)`;}}}}}});
+  },
+  chFunnel(cv){
+    const i=state.sel;
+    const vals=[D.depositantes[i],D.d2abs[i],D.d3abs[i],D.d4abs[i]];
+    const cols=['rgba(139,92,246,.85)','rgba(122,110,240,.8)','rgba(88,150,243,.75)','rgba(34,211,238,.7)'];
+    return new Chart(cv,{type:'bar',
+      data:{labels:['1º dep (todos)','2º dep+','3º dep+','4º dep+'],
+        datasets:[{data:vals,backgroundColor:cols,borderRadius:7,barPercentage:.72}]},
+      options:{maintainAspectRatio:false,indexAxis:'y',
+        scales:{x:{ticks:{callback:v=>fmtK(v)}},y:{grid:{display:false}}},
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{label:c=>{
+            const pct=c.dataIndex===0?100:[null,D.taxa2,D.taxa3,D.taxa4][c.dataIndex][i];
+            const drop=c.dataIndex===0?null:vals[c.dataIndex-1]-vals[c.dataIndex];
+            return [`${nf.format(c.raw)} jogadores (${f1(pct)}%)`,drop!=null?`Perda vs. degrau anterior: ${nf.format(drop)}`:''].filter(Boolean);}}}}}});
+  },
+  chMix(cv){
+    return new Chart(cv,{type:'bar',
+      data:{labels:sl(M),datasets:[
+        {label:'Depositantes no mês',data:sl(D.depositantes),backgroundColor:'rgba(139,92,246,.8)',stack:'m',borderRadius:5},
+        {label:'Ativos sem depósito',data:sl(D.semDeposito),backgroundColor:'rgba(148,163,200,.32)',stack:'m',borderRadius:5}]},
+      options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        onClick:(e,el,ch)=>{const p=ch.getElementsAtEventForMode(e,'index',{intersect:false},true);if(p.length)openMonth(p[0].index);},
+        scales:{y:{stacked:true,ticks:{callback:v=>fmtK(v)}},x:{stacked:true,grid:{display:false}}},
+        plugins:{legend:{position:'bottom'},
+          tooltip:{callbacks:{
+            label:c=>`${c.dataset.label}: ${nf.format(c.raw)}`,
+            footer:it=>{const i=it[0].dataIndex;return `Sem depósito: ${f1(D.semDeposito[i]/D.mau[i]*100)}% do MAU`;}}}}}});
+  },
+  chTurn(cv){
+    const ctx=cv.getContext('2d');
+    return new Chart(cv,{type:'line',
+      data:{labels:sl(M),datasets:[
+        {label:'Turnover por jogador ativo',data:sl(D.turnover),borderColor:C.c,borderWidth:2.5,tension:.35,
+          pointRadius:3.5,pointBackgroundColor:'#fff',pointBorderColor:C.c,pointBorderWidth:2,
+          fill:true,backgroundColor:grad(ctx,'rgba(34,211,238,.22)','rgba(34,211,238,0)')}]},
+      options:{maintainAspectRatio:false,
+        scales:{y:{ticks:{callback:v=>'R$ '+nf.format(v)}},x:{grid:{display:false}}},
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{label:c=>fR(c.raw),
+            footer:it=>{const i=it[0].dataIndex;return i>0?`MoM: ${((D.turnover[i]/D.turnover[i-1]-1)*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}% · FTDs MoM: ${((D.ftds[i]/D.ftds[i-1]-1)*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}%`:'';}}}}}});
+  }
+};
+
+const PANEL_CHARTS={geral:['chFlow'],retencao:[],recorr:['chRec','chFunnel'],segmentos:['chMix','chTurn'],notas:[]};
+
+function buildChart(id){
+  const cv=document.getElementById(id); if(!cv||!factories[id]) return;
+  if(state.charts[id]) state.charts[id].destroy();
+  state.charts[id]=factories[id](cv);
+}
+function ensurePanelCharts(tab,replay){
+  (PANEL_CHARTS[tab]||[]).forEach(id=>{
+    if(!state.charts[id]) buildChart(id);
+    else if(replay&&!RM){state.charts[id].reset();state.charts[id].update();}
+  });
+}
+function rebuildAllBuilt(){
+  Object.keys(state.charts).forEach(id=>buildChart(id));
+}
+
+/* zoom reset */
+document.querySelectorAll('.zbtn').forEach(b=>b.onclick=()=>{
+  const ch=state.charts[b.dataset.z]; if(ch&&ch.resetZoom) ch.resetZoom();
+});
+
+/* =====================================================================
+   TABS
+   ===================================================================== */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  if(t.dataset.t===state.tab) return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  state.tab=t.dataset.t;
+  const panel=document.getElementById('p-'+state.tab);
+  void panel.offsetWidth;                 /* reinicia a animação dos .fx */
+  panel.classList.add('show');
+  panel.querySelectorAll('.fx').forEach((el,ix)=>el.style.animationDelay=(ix*70)+'ms');
+  ensurePanelCharts(state.tab,true);
+  scrollTo({top:0,behavior:RM?'auto':'smooth'});
+});
+
+/* =====================================================================
+   SELETOR DE MÊS
+   ===================================================================== */
+function renderMonthSel(){
+  document.getElementById('monthSel').innerHTML=M.map((m,i)=>
+    `<button class="mbtn${i===state.sel?' on':''}" data-i="${i}">${m}</button>`).join('');
+}
+document.getElementById('monthSel').addEventListener('click',e=>{
+  const b=e.target.closest('.mbtn'); if(!b)return;
+  state.sel=b.dataset.i|0; renderMonthSel(); renderAll(); rebuildAllBuilt();
+});
+document.getElementById('btnExport').onclick=()=>{
+  Object.keys(PANEL_CHARTS).forEach(t=>ensurePanelCharts(t,false));
+  setTimeout(()=>window.print(),300);
+};
+
+/* =====================================================================
+   DRILL-DOWN (modal)
+   ===================================================================== */
+const modal=document.getElementById('modal');
+function openModal({title,sub,def,rows,series}){
+  document.getElementById('mtitle').innerHTML=title;
+  document.getElementById('msub').innerHTML=sub||'';
+  const dEl=document.getElementById('mdef');
+  if(def){dEl.style.display='block';dEl.innerHTML=def;}else dEl.style.display='none';
+  document.getElementById('mgrid').innerHTML=rows.map(r=>`<div class="mrow"><div class="k">${r[0]}</div><div class="v">${r[1]}</div></div>`).join('');
+  if(state.modalChart){state.modalChart.destroy();state.modalChart=null;}
+  const box=document.querySelector('.mchart');
+  if(series){box.style.display='block';
+    state.modalChart=new Chart(document.getElementById('mcanvas'),{type:series.type||'line',
+      data:{labels:series.labels,datasets:[{label:series.label,data:series.data,
+        borderColor:C.v,backgroundColor:series.type==='bar'?'rgba(139,92,246,.7)':C.v,
+        borderWidth:2.5,tension:.3,pointRadius:4,borderRadius:5,
+        pointBackgroundColor:'#fff',pointBorderColor:C.v,pointBorderWidth:2}]},
+      options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>series.fmt?series.fmt(c.raw):c.raw}}},
+        scales:{y:{ticks:{callback:v=>series.fmt?series.fmt(v):v}},x:{grid:{display:false}}}}});
+  } else box.style.display='none';
+  modal.classList.add('open');
+}
+function closeModal(){modal.classList.remove('open');if(state.modalChart){state.modalChart.destroy();state.modalChart=null;}}
+document.getElementById('mclose').onclick=closeModal;
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+const METRICS={
+  0:{label:'MAU',def:'<b>MAU</b> — jogadores únicos que apostaram ou depositaram no mês. O número mais importante da retenção.',data:()=>D.mau,fmt:v=>fmtK(v)},
+  1:{label:'Novos FTDs',def:'<b>Novos FTDs</b> — primeiro depósito da vida. Entram no MAU, mas são aquisição, não retenção.',data:()=>D.ftds,fmt:v=>fmtK(v),type:'bar'},
+  2:{label:'Churn Rate (base existente)',def:'<b>Churn Rate</b> = 1 − ((MAU − FTDs − Reativados) ÷ MAU anterior). Saudável no iGaming BR: abaixo de 30%; acima de 40% = problema sério.',data:()=>D.churnRate,fmt:v=>f1(v)+'%'},
+  3:{label:'Retenção D30 por safra',def:'<b>Retenção D30</b> — % da safra de FTDs ativa após 30 dias. Abaixo de 25% indica problema de onboarding.',data:()=>D.cohorts.map(c=>c.d30),labels:()=>D.cohorts.map(c=>c.m),fmt:v=>v!=null?f1(v)+'%':'—'},
+  4:{label:'Taxa de 2º depósito',def:'<b>Taxa de Recorrência</b> = recorrentes ÷ total de depositantes do mês. O 2º depósito é o indicador mais direto de hábito formado.',data:()=>D.taxa2,fmt:v=>f1(v)+'%'},
+  5:{label:'Turnover por jogador ativo',def:'<b>Turnover</b> — valor médio movimentado por ativo. Cuidado com efeito de mix: safra nova de baixo valor derruba a média.',data:()=>D.turnover,fmt:v=>fR(v)},
+};
+document.getElementById('kpiStrip').addEventListener('click',e=>{
+  const card=e.target.closest('.kpi'); if(!card)return;
+  const mt=METRICS[card.dataset.k]; const data=mt.data(); const labels=mt.labels?mt.labels():M;
+  const clean=data.filter(v=>v!=null);
+  openModal({title:mt.label,sub:'Série completa · dez/25 → jun/26',def:mt.def,
+    rows:[["Mínimo da série",mt.fmt(Math.min(...clean))],["Máximo da série",mt.fmt(Math.max(...clean))],
+          ["Média",mt.fmt(clean.reduce((a,b)=>a+b,0)/clean.length)],["Último valor",mt.fmt(clean[clean.length-1])]],
+    series:{labels,data,label:mt.label,fmt:mt.fmt,type:mt.type||'line'}});
+});
+function openMonth(i){
+  const inn=D.ftds[i]+D.reativados[i];
+  const imp=mauPrev(i)-(D.mau[i]-D.ftds[i]-D.reativados[i]);
+  openModal({title:`Raio-x · ${M[i]}`,sub:'Fluxo da base no mês',
+    rows:[["MAU",nf.format(D.mau[i])],["Δ MAU MoM",(D.mau[i]-mauPrev(i)>=0?'+':'')+nf.format(D.mau[i]-mauPrev(i))],
+      ["Novos FTDs",nf.format(D.ftds[i])],["Reativados",nf.format(D.reativados[i])],
+      ["Entradas totais",nf.format(inn)],["Churn Absoluto",nf.format(D.churnAbs[i])],
+      ["Saída implícita (identidade MAU)","≈ "+nf.format(imp)],["Churn Rate",f1(D.churnRate[i])+"%"],
+      ["Depositantes",nf.format(D.depositantes[i])],["Sem depósito",nf.format(D.semDeposito[i])+" <small>("+f1(D.semDeposito[i]/D.mau[i]*100)+"% do MAU)</small>"],
+      ["Turnover/ativo",fR(D.turnover[i])],["Taxa 2º dep",f1(D.taxa2[i])+"%"]],
+    series:{labels:M,data:D.mau,label:'MAU',fmt:v=>fmtK(v)}});
+}
+function openRec(i){
+  openModal({title:`Recorrência · ${M[i]}`,sub:'Escada de depósitos do mês',
+    def:'Denominador = Total de Depositantes do mês (inclui FTDs novos — meses de aquisição alta diluem a taxa).',
+    rows:[["Total depositantes",nf.format(D.depositantes[i])],["FTDs novos no mix",nf.format(D.ftds[i])+" <small>("+f1(D.ftds[i]/D.depositantes[i]*100)+"%)</small>"],
+      ["2º dep+",nf.format(D.d2abs[i])+" <small>("+f1(D.taxa2[i])+"%)</small>"],["3º dep+",nf.format(D.d3abs[i])+" <small>("+f1(D.taxa3[i])+"%)</small>"],
+      ["4º dep+",nf.format(D.d4abs[i])+" <small>("+f1(D.taxa4[i])+"%)</small>"],
+      ["Degrau 1º→2º (perda)",nf.format(D.depositantes[i]-D.d2abs[i])+" jogadores"]],
+    series:{labels:['1º dep','2º dep+','3º dep+','4º dep+'],
+      data:[D.depositantes[i],D.d2abs[i],D.d3abs[i],D.d4abs[i]],label:'Jogadores',fmt:v=>fmtK(v),type:'bar'}});
+}
+document.getElementById('cohortTable').addEventListener('click',e=>{
+  const tr=e.target.closest('tr.rowc'); if(!tr)return;
+  const c=D.cohorts[tr.dataset.c|0];
+  const rows=[["FTDs D0 (base do cohort)",nf.format(c.d0)],
+    ["Ativos D30",c.a30!=null?nf.format(c.a30)+" <small>("+f1(c.d30)+"%)</small>":"não maturado"],
+    ["Ativos D60",c.a60!=null?nf.format(c.a60)+" <small>("+f1(c.d60)+"%)</small>":"não maturado"],
+    ["Ativos D90",c.a90!=null?nf.format(c.a90)+" <small>("+f1(c.d90)+"%)</small>":"não maturado"]];
+  if(c.a30!=null) rows.push(["Perda D0→D30",nf.format(c.d0-c.a30)+" jogadores"]);
+  openModal({title:`Safra ${c.m}`,sub:c.tag||'Cohort de novos depositantes',
+    def:'<b>Retenção D30/D60/D90</b> — % da safra ainda apostando após 30/60/90 dias.',
+    rows,
+    series:{labels:['D0','D30','D60','D90'],data:[100,c.d30,c.d60,c.d90],label:'% ativa',fmt:v=>v!=null?f1(v)+'%':'—'}});
+});
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+renderMonthSel(); renderStatic(); renderAll();
+document.querySelectorAll('#p-geral .fx').forEach((el,ix)=>el.style.animationDelay=(ix*70)+'ms');
+ensurePanelCharts('geral',false);
 </script>
+</body>
 </html>
