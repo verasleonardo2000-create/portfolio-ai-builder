@@ -12,6 +12,6 @@ Sou profissional de Marketing e CRM e curso pós-graduação em Análise de Dado
 
 O Sereno salva informações no navegador. Use dados fictícios durante o teste.
 
-No dashboard original, usei Claude para organizar a leitura dos indicadores e apoiar a priorização das ações de CRM. A demonstração recria o fluxo de leitura com dados fictícios. No gerador de peças, a seleção automática de odds ficou como proposta de evolução.
+No dashboard original, usei Claude para organizar a leitura dos indicadores e apoiar a priorização das ações de CRM. A demonstração recria o fluxo de leitura com dados fictícios. 
 
 [LinkedIn](https://www.linkedin.com/in/leonardo-veras-438004234/)
