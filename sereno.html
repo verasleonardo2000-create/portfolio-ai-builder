@@ -403,7 +403,7 @@ textarea{resize:vertical;min-height:100px}
     <div class="hdr-logo">🌿</div>
     <div class="hdr-brand">
       <h1>Sereno</h1>
-      <p>Gestão de consultório</p>
+      <p>Demo com dados fictícios</p>
     </div>
   </div>
   <nav class="hdr-nav">
@@ -828,6 +828,72 @@ const pad = n => String(n).padStart(2,'0');
 function load(k) { try { return JSON.parse(localStorage.getItem('sereno-demo:' + k)) || []; } catch { return []; } }
 function loadObj(k, d={}) { try { return JSON.parse(localStorage.getItem('sereno-demo:' + k)) || d; } catch { return d; } }
 function save(k, v) { localStorage.setItem('sereno-demo:' + k, JSON.stringify(v)); }
+
+function prepararDadosDemo() {
+  const chaves = ['pacientes', 'consultas', 'despesas'];
+  if (chaves.some(chave => localStorage.getItem('sereno-demo:' + chave) !== null)) return;
+
+  const pacientes = [
+    ['Clara Monteiro', 190], ['Rafael Nogueira', 220], ['Lívia Almeida', 180],
+    ['Marcos Ferraz', 210], ['Sofia Campos', 200],
+  ].map(([nome, valor], i) => ({
+    id: 'demo-p' + (i + 1), nome, valor, status: i === 4 ? 'inativo' : 'ativo',
+    email: '', telefone: '', nascimento: '', obs: '',
+  }));
+
+  const ano = hoje.getFullYear();
+  const mes = hoje.getMonth();
+  const dia = hoje.getDate();
+  const dataLocal = data => `${data.getFullYear()}-${pad(data.getMonth() + 1)}-${pad(data.getDate())}`;
+  const consultas = [];
+  const despesas = [];
+
+  function adicionarConsulta(indice, data, horario, statusSessao) {
+    const paciente = pacientes[indice];
+    consultas.push({
+      id: 'demo-c' + (consultas.length + 1), pacienteId: paciente.id,
+      nome: paciente.nome, valor: paciente.valor, data: dataLocal(data),
+      horario, horarioFim: addMin(horario, 50), statusSessao,
+      pagamento: statusSessao === 'pagamento' ? 'pagou' : 'pendente',
+      nf: statusSessao === 'pagamento' ? 'emitida' : 'falta-emitir',
+      procedimento: 'Sessão de terapia',
+    });
+  }
+
+  function adicionarDespesa(descricao, categoria, data, valor) {
+    despesas.push({
+      id: 'demo-d' + (despesas.length + 1), descricao, categoria,
+      data: dataLocal(data), valor,
+    });
+  }
+
+  for (let anterior = 3; anterior >= 1; anterior--) {
+    const total = 5 + anterior;
+    for (let i = 0; i < total; i++) {
+      adicionarConsulta(i % pacientes.length, new Date(ano, mes - anterior, 3 + i * 3),
+        i % 2 === 0 ? '09:00' : '15:00', i === total - 1 ? 'concluida' : 'pagamento');
+    }
+    adicionarDespesa('Locação da sala', 'Aluguel', new Date(ano, mes - anterior, 3), 420);
+    adicionarDespesa('Plataforma de videochamada', 'Software', new Date(ano, mes - anterior, 8), 65);
+  }
+
+  const primeiroDia = Math.max(1, dia - 9);
+  for (let i = 0; i < 5; i++) {
+    adicionarConsulta(i % 4, new Date(ano, mes, Math.min(dia, primeiroDia + i * 2)),
+      ['08:00', '09:00', '10:30', '14:00', '16:00'][i],
+      ['pagamento', 'pagamento', 'concluida', 'pagamento', 'faltou'][i]);
+  }
+  [0, 1, 2, 4, 7, 10].forEach((intervalo, i) => {
+    adicionarConsulta(i % 4, new Date(ano, mes, dia + intervalo), '17:00', 'agendada');
+  });
+  adicionarDespesa('Locação da sala', 'Aluguel', new Date(ano, mes, 1), 420);
+  adicionarDespesa('Plataforma de videochamada', 'Software', new Date(ano, mes, Math.min(dia, 4)), 65);
+  adicionarDespesa('Materiais de escritório', 'Materiais', new Date(ano, mes, Math.min(dia, 7)), 45);
+
+  save('pacientes', pacientes);
+  save('consultas', consultas);
+  save('despesas', despesas);
+}
 
 // ════════════════════════════════════════════
 //  MIGRAÇÃO
@@ -2345,6 +2411,7 @@ function renderGrafico(consultas, despesas) {
 // ════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════
+prepararDadosDemo();
 migrar();
 carregarPerfil();
 renderDashboard();
