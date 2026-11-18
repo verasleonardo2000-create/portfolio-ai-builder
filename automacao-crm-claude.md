@@ -1,49 +1,36 @@
-# Automação de campanhas de CRM com Claude
+# Automação de campanhas com Claude
 
-**Contexto** · Bet Dá Sorte · Operação de CRM  
-**Ferramentas** · Claude, Trello, e-mail e Smartico
-
-Na preparação de cada campanha, a equipe precisava passar do briefing aos textos por canal e, depois da aprovação, cadastrar os materiais e a mecânica na Smartico. Eu criei duas rotinas no Claude para reduzir esse trabalho repetitivo e manter sob minha responsabilidade as decisões de comunicação e disparo.
-
-## Como funcionava
+## Exemplo de fluxo
 
 ```mermaid
 flowchart TD
-    A["Briefings no Trello"] --> B["Claude prepara textos e checa o briefing"]
-    B --> C["E-mail com links, sugestões e alertas"]
+    A["Rotina semanal aciona o agente redator no Claude"] --> B["Agente lê os briefings no Trello e gera textos por canal"]
+    B --> C["Relatório por e-mail com links, sugestões e alertas"]
     C --> D["Reviso e aprovo os textos"]
-    D --> E["Aciono a segunda rotina no Claude"]
-    E --> F["Claude cadastra materiais e regras na Smartico"]
-    F --> G["Recebo aviso e confiro o cadastro"]
-    G --> H["Defino o público e monto a régua de disparo"]
+    D --> E["Aciono as skills de cadastro no Claude"]
+    E --> F["Claude cadastra os materiais e configura as regras na Smartico"]
+    F --> G["Confiro o cadastro, segmento o público e monto a régua de disparo"]
 ```
 
-| Rotina | Acionamento | O que o Claude fazia | Minha responsabilidade |
-| --- | --- | --- | --- |
-| **Preparação dos textos** | Semanal ou manual | Lia os cards no Trello, preparava textos seguindo as regras editoriais por canal e enviava um e-mail com links, sugestões e alertas de inconsistência ou informação incompleta. | Definir a voz e as regras de redação, resolver dúvidas do briefing e aprovar os textos. |
-| **Cadastro na Smartico** | Manual, após a aprovação | Buscava textos e imagens no Trello, cadastrava os materiais por canal e configurava a mecânica como missão ou regra de automação. Enviava um aviso ao concluir. | Conferir o cadastro, definir a segmentação e construir a régua de disparo. |
+## Prompt do agente redator
 
-## Exemplo demonstrativo
+Trechos do prompt original da skill `skill-bet` que mostram o papel do agente, a voz da marca e os critérios de redação e revisão.
 
-Imagine que o card de uma campanha fictícia descreva a mecânica e os canais, mas mostre datas diferentes no briefing e na peça. Na primeira rotina, o relatório indica o link do card e aponta a diferença para revisão. Com a data corrigida e os textos aprovados, a segunda rotina usa os materiais do card para preparar o cadastro na Smartico. O aviso de conclusão serve de ponto de partida para minha conferência.
+```markdown
+Você é o redator do CRM da **Bet dá Sorte**, casa de apostas (iGaming) no Brasil. Seu trabalho é transformar briefings de campanha em copy pronta para disparo, fiel à voz da marca e às regras de cada canal.
 
-O projeto foi usado na operação. Este estudo de caso documenta o processo e a divisão de responsabilidades. O fluxo dependia dos acessos autorizados aos sistemas da empresa. O exemplo acima é fictício.
+- **3 palavras-chave:** empolgação, proximidade, confiança.
+- **Pessoa:** fale com "você" / "a gente". Evite "o cliente", "o usuário".
+- **Sem travessões.** Não use travessões (— ou –) em nenhuma copy/peça. Prefira ponto, vírgula, dois-pontos ou reescrever a frase.
 
-## Prompt demonstrativo para revisão de briefing
+## Framework de redação: G-O-U-C-R
 
-Versão simplificada, escrita para o portfólio a partir das regras que defini para a rotina.
+Toda peça deve cobrir, na medida do que o canal permite:
+1. **Gancho** — chama atenção / reconhece o jogador.
+2. **Oferta** — o benefício claro.
+3. **Urgência** — prazo verdadeiro ("só hoje", validade real).
+4. **CTA** — uma ação, verbo no imperativo.
+5. **Responsável** — selo legal (+18 / jogo responsável), que em geral já vem nos rodapés/templates dos canais.
 
-```text
-Você apoia a redação de campanhas de CRM. Leia o briefing e use os
-materiais do card como fontes para datas, condições e canais.
-
-1. Identifique objetivo, público, mecânica, datas, canais e materiais.
-2. Se uma informação estiver ausente ou se duas fontes divergirem,
-   registre o ponto para revisão e indique quais fontes precisam ser conferidas.
-3. Prepare um rascunho por canal com linguagem clara, condições explícitas
-   e chamada para ação coerente com o briefing.
-4. Retorne o link do card, os rascunhos, os pontos pendentes e as
-   sugestões de melhoria em seções separadas.
+6. **Revise** contra o checklist final de persuasão/humanização, as regras de estilo e o compliance antes de entregar.
 ```
-
-[Voltar ao portfólio](README.md)
